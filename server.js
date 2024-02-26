@@ -1,45 +1,56 @@
 #!/usr/bin/env node
 
+// server.js
+
 const net = require('net');
 
 const PORT = 8000;
-const DELIMITER = '\r\n';
 
-// Array to hold connected clients
+// Counter for generating unique client IDs
+let nextClientId = 1;
+
+// Array to hold connected clients, each with an ID
 const clients = [];
 
 // Function to broadcast messages to all clients
 function broadcast(message, sender) {
     clients.forEach(client => {
         // Send the message to all clients except the sender
-        if (client !== sender) {
-            client.write(message);
+        if (client.socket !== sender) {
+            client.socket.write(message);
         }
     });
 }
 
 // Create a TCP server
-const server = net.createServer(client => {
+const server = net.createServer(clientSocket => {
+    // Generate a unique ID for the client
+    const clientId = nextClientId++;
+
     // Add the new client to the array
-    clients.push(client);
+    clients.push({ id: clientId, socket: clientSocket });
+
+    // Broadcast a message to all clients to inform about the new connection
+    const message = JSON.stringify({ sender: "Server",type: 'connection', text: `Client ${clientId} has connected` }) + '\r\n';
+    broadcast(message, clientSocket);
 
     // Set up event listeners for data, end, and error events
-    client.on('data', data => {
+    clientSocket.on('data', data => {
         const message = data.toString().trim();
 
         // Broadcast the message to all clients
-        broadcast(message, client);
+        broadcast(message, clientSocket);
     });
 
-    client.on('end', () => {
+    clientSocket.on('end', () => {
         // Remove the client from the array when it disconnects
-        const index = clients.indexOf(client);
+        const index = clients.findIndex(client => client.socket === clientSocket);
         if (index !== -1) {
             clients.splice(index, 1);
         }
     });
 
-    client.on('error', err => {
+    clientSocket.on('error', err => {
         console.error('Client error:', err);
     });
 });
