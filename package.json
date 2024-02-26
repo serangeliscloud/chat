@@ -1,0 +1,23 @@
+{
+  "name": "chat",
+  "version": "1.0.0",
+  "description": "",
+  "main": "client.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "node client.js",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/serangeliscloud/chat.git"
+  },
+  "author": "Francesco Serangeli (serangelicloud)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/serangeliscloud/chat/issues"
+  },
+  "homepage": "https://github.com/serangeliscloud/chat#readme"
+}
