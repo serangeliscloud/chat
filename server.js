@@ -5,6 +5,7 @@
 const net = require('net');
 
 const PORT = 8000;
+const ALLOWED_VERSION = "1.1.0";
 
 // Counter for generating unique client IDs
 let nextClientId = 1;
@@ -22,6 +23,24 @@ function broadcast(message, sender) {
     });
 }
 
+// Function to handle initial messages from clients upon connection
+function handleInitialMessage(message, clientSocket) {
+    // Check if the client version matches the allowed version
+    if (message.type === 'authentication' && message.clientVersionNumber !== ALLOWED_VERSION) {
+        console.log(`Connection from client with version ${message.clientVersionNumber} refused.`);
+        clientSocket.end(); // Close the connection immediately
+        return;
+    }
+
+    // Handle the initial message based on its type or content
+    console.log(`Received initial message from ${message.sender} - client version: ${message.clientVersionNumber}`);
+    // You can authenticate the client, validate its version, etc.
+
+    // Broadcast join message to all clients
+    const joinMessage = JSON.stringify({ sender: "Server", text: `${message.sender} joined the chat` }) + '\r\n';
+    broadcast(joinMessage, clientSocket);
+}
+
 // Create a TCP server
 const server = net.createServer(clientSocket => {
     // Generate a unique ID for the client
@@ -30,16 +49,26 @@ const server = net.createServer(clientSocket => {
     // Add the new client to the array
     clients.push({ id: clientId, socket: clientSocket });
 
-    // Broadcast a message to all clients to inform about the new connection
-    const message = JSON.stringify({ sender: "Server",type: 'connection', text: `Client ${clientId} has connected` }) + '\r\n';
-    broadcast(message, clientSocket);
-
     // Set up event listeners for data, end, and error events
     clientSocket.on('data', data => {
-        const message = data.toString().trim();
-
-        // Broadcast the message to all clients
-        broadcast(message, clientSocket);
+        const message = JSON.parse(data.toString().trim());
+        
+        // Check if it's the initial message upon connection
+        if (message.clientVersionNumber === ALLOWED_VERSION) {
+            if (message.type === 'leaving') {
+                const leaveMessage = JSON.stringify({ sender: "Server", text: `${message.sender} left the chat` }) + '\r\n';
+                broadcast(leaveMessage, clientSocket);
+                console.log(message.sender, " left the chat")
+            } else if (message.type === 'authentication') {
+                handleInitialMessage(message, clientSocket);
+            } else {
+                // Broadcast the message to all clients
+                broadcast(data.toString(), clientSocket);
+                console.log(`${message.sender} - ${message.clientVersionNumber}:  ${message.text}`);
+            }
+        } else {
+            clientSocket.end(); // Close the connection immediately
+        }
     });
 
     clientSocket.on('end', () => {
@@ -48,6 +77,7 @@ const server = net.createServer(clientSocket => {
         if (index !== -1) {
             clients.splice(index, 1);
         }
+        
     });
 
     clientSocket.on('error', err => {

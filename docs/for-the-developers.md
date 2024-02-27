@@ -1,141 +1,85 @@
-### Server.js Documentation
+**Developer's Guide: Understanding the Chat Application Code**
 
-#### Introduction
-The `server.js` file contains the code for a TCP server that facilitates communication between multiple clients in a chat room.
+In this guide, we'll delve into the provided code for building a chat application using Node.js. We'll explore both the server-side (`server.js`) and client-side (`client.js`) components, explaining how each piece works and how they interact.
 
-#### Code Snippet
+### Server Component (`server.js`)
+
+#### 1. Creating the TCP Server
 ```javascript
-const net = require('net');
-
-const PORT = 8000;
-let nextClientId = 1;
-const clients = [];
-
-// Function to broadcast messages to all clients
-function broadcast(message, sender) {
-    clients.forEach(client => {
-        if (client.socket !== sender) {
-            client.socket.write(message);
-        }
-    });
-}
-
-// Create a TCP server
 const server = net.createServer(clientSocket => {
-    // Generate a unique ID for the client
-    const clientId = nextClientId++;
-    // Add the new client to the array
-    clients.push({ id: clientId, socket: clientSocket });
-
-    // Broadcast a message to all clients to inform about the new connection
-    const connectionMessage = JSON.stringify({ sender: "Server", type: 'connection', text: `Client ${clientId} has connected` }) + '\r\n';
-    broadcast(connectionMessage, clientSocket);
-
-    // Event listener for receiving data from the client
-    clientSocket.on('data', data => {
-        const message = data.toString().trim();
-        // Broadcast the message to all clients
-        broadcast(message, clientSocket);
-    });
-
-    // Event listener for client disconnection
-    clientSocket.on('end', () => {
-        // Remove the client from the array when it disconnects
-        const index = clients.findIndex(client => client.socket === clientSocket);
-        if (index !== -1) {
-            clients.splice(index, 1);
-        }
-    });
-
-    // Event listener for client errors
-    clientSocket.on('error', err => {
-        console.error('Client error:', err);
-    });
-});
-
-// Start listening for connections
-server.listen(PORT, () => {
-    console.log(`Chat server is running on port ${PORT}`);
+    // Server logic goes here
 });
 ```
+- This snippet creates a TCP server using Node.js `net` module. It listens for client connections and executes the provided callback function when a new client connects.
 
-#### Explanation
-- The server listens for incoming connections on port 8000.
-- Each client is assigned a unique ID upon connection and added to the `clients` array.
-- When a client connects, a message is broadcasted to inform others about the new connection.
-- Event listeners handle data reception, client disconnection, and error handling.
-
-### Client.js Documentation
-
-#### Introduction
-The `client.js` file contains the code for a TCP client that connects to the chat server and allows users to send and receive messages.
-
-#### Code Snippet
+#### 2. Handling Client Connections
 ```javascript
-const net = require('net');
-const readline = require('readline');
-
-const HOST = 'localhost';
-const PORT = 8000;
-
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
+clientSocket.on('data', data => {
+    // Logic for handling incoming data from clients
 });
 
-// Function to get username from the user
-function getUsername(callback) {
-    rl.question('Please enter your username: ', (username) => {
-        callback(username);
-    });
-}
+clientSocket.on('end', () => {
+    // Logic for handling client disconnection
+});
 
-// Create a TCP client
-getUsername((USERNAME) => {
-    const client = net.createConnection({ host: HOST, port: PORT }, () => {
-        console.log('Connected to the chat server');
-        console.log(`Username set as: ${USERNAME}`);
-    });
-
-    // Event listener for receiving data from the server
-    client.on('data', data => {
-        const message = JSON.parse(data.toString());
-        console.log(`${message.sender}: ${message.text}`);
-    });
-
-    // Event listener for server connection closed
-    client.on('end', () => {
-        console.log('Disconnected from the chat server');
-    });
-
-    // Event listener for client errors
-    client.on('error', err => {
-        console.error('Client error:', err);
-    });
-
-    // Event listener for user input
-    rl.on('line', input => {
-        // Create a JSON message object
-        const message = {
-            sender: USERNAME,
-            text: input
-        };
-
-        // Send the JSON message to the server
-        client.write(JSON.stringify(message) + '\r\n');
-    });
-
-    // Handle Ctrl+C to gracefully disconnect from the server
-    rl.on('SIGINT', () => {
-        client.end();
-        rl.close();
-    });
+clientSocket.on('error', err => {
+    // Logic for handling client errors
 });
 ```
+- These event listeners handle various events associated with client connections:
+  - `'data'`: Handles incoming data from clients, such as messages.
+  - `'end'`: Handles client disconnection events.
+  - `'error'`: Handles errors that occur during client-server communication.
 
-#### Explanation
-- The client prompts the user to enter a username.
-- Upon receiving the username, it establishes a connection to the server.
-- Incoming messages from the server are displayed to the user.
-- Users can input messages via the command line, which are sent to the server.
-- Event listeners handle server connection events, data reception, and user input.
+#### 3. Broadcasting Messages
+```javascript
+function broadcast(message, sender) {
+    // Logic for broadcasting messages to all clients
+}
+```
+- The `broadcast` function sends messages received from one client to all other connected clients, excluding the sender.
+
+#### 4. Handling Initial Messages
+```javascript
+function handleInitialMessage(message, clientSocket) {
+    // Logic for handling initial messages from clients (e.g., authentication)
+}
+```
+- This function processes initial messages sent by clients upon connection. It can perform tasks such as authentication, validating client versions, and broadcasting join messages to other clients.
+
+### Client Component (`client.js`)
+
+#### 1. Creating the TCP Client
+```javascript
+const client = net.createConnection({ host: HOST, port: PORT }, () => {
+    // Client connection logic goes here
+});
+```
+- This snippet creates a TCP client connection to the specified host and port.
+
+#### 2. Handling User Input
+```javascript
+rl.on('line', input => {
+    // Logic for handling user input (sending messages)
+});
+```
+- This event listener captures user input from the command line interface using the `readline` module and sends it to the server as a message.
+
+#### 3. Handling Server Messages
+```javascript
+client.on('data', data => {
+    // Logic for handling incoming messages from the server
+});
+```
+- This event listener receives messages from the server, parses them, and displays them to the user.
+
+#### 4. Graceful Disconnection
+```javascript
+rl.on('SIGINT', () => {
+    // Logic for gracefully disconnecting from the server
+});
+```
+- This event listener captures the Ctrl+C signal and triggers a graceful disconnection from the server, sending a farewell message before closing the connection.
+
+### Conclusion
+This developer's guide provides insights into how the provided code implements the server and client components of a chat application in Node.js. By understanding each piece's functionality and how they interact, developers can extend the application's features and customize it according to their requirements.

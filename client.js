@@ -6,7 +6,7 @@ const readline = require('readline');
 
 const HOST = 'localhost';
 const PORT = 8000;
-
+const clientVersion = '1.1.0';
 // Set up readline interface for user input
 const rl = readline.createInterface({
     input: process.stdin,
@@ -25,6 +25,15 @@ getUsername((USERNAME) => {
     const client = net.createConnection({ host: HOST, port: PORT }, () => {
         console.log('Connected to the chat server');
         console.log(`Username set as: ${USERNAME}`);
+        
+        // Send an initial message to the server for client information gathering 
+        const initialMessage = {
+            sender: USERNAME,
+            type: 'authentication', 
+            clientVersionNumber: clientVersion,
+            text: 'Initial message for authentication or other purposes'
+        };
+        client.write(JSON.stringify(initialMessage) + '\r\n');
     });
 
     // Event listener for receiving data from the server
@@ -48,7 +57,8 @@ getUsername((USERNAME) => {
         // Create a JSON message object
         const message = {
             sender: USERNAME,
-            text: input
+            text: input,
+            clientVersionNumber: clientVersion
         };
 
         // Send the JSON message to the server
@@ -57,6 +67,13 @@ getUsername((USERNAME) => {
 
     // Handle Ctrl+C to gracefully disconnect from the server
     rl.on('SIGINT', () => {
+        const finalMessage = {
+            sender: "Server",
+            type: 'Exiting', 
+            clientVersionNumber: clientVersion,
+            text: (USERNAME+ " left the chat")
+        };
+        client.write(JSON.stringify(finalMessage) + '\r\n');
         client.end();
         rl.close();
     });

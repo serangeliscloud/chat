@@ -1,5 +1,11 @@
+02.26.2024, v1.1.0
+- (+) added client version authentication
+- (§) modified join message
+- (+) added message logging in server commands
+- (+) added
+
 02.26.2024, v1.0.0a
-- added a option to choose your own username
-- basic connection log message from server to clients with client identification via client id
+- (+) added a option to choose your own username
+- (+) basic connection log message from server to clients with client identification via client id
 02.26.2024, v1.0.0
 - initial commit
