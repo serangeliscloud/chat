@@ -69,16 +69,29 @@ getUsername((username) => {
 
 // Event listener for user input
 rl.on('line', input => {
-    // Create a JSON message object
-    const message = {
-        sender: USERNAME,
-        text: input,
-        clientVersionNumber: clientVersion
-    };
-
-    // Send the JSON message to the server
-    client.write(JSON.stringify(message) + '\r\n');
+    // Check if the input starts with '!'
+    if (input.startsWith('!')) {
+        // If it does, set message type as 'command'
+        const message = {
+            sender: USERNAME,
+            type: 'command',
+            command: input.slice(1), // Remove '!' from the text
+            clientVersionNumber: clientVersion
+        };
+        // Send the JSON message to the server
+        client.write(JSON.stringify(message) + '\r\n');
+    } else {
+        // If not a command, treat it as a regular message
+        const message = {
+            sender: USERNAME,
+            text: input,
+            clientVersionNumber: clientVersion
+        };
+        // Send the JSON message to the server
+        client.write(JSON.stringify(message) + '\r\n');
+    }
 });
+
 
 // Handle Ctrl+C to gracefully disconnect from the server
 rl.on('SIGINT', () => {

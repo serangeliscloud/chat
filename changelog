@@ -1,3 +1,6 @@
+### 03.04.2024, v1.2.0
+- added freaking commands logic, now you are able to create custom responser and interaction to commands by adding cases to the switch case in the `server.js` file at `line 86`
+
 ### 03.04.2024, v1.1.2
 - removed logging message for `initial message` in client code
 - fixed username not defined upon leaving
