@@ -14,9 +14,13 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
+// Define username as a constant
+let USERNAME;
+
 // Function to get username
 function getUsername(callback) {
     rl.question('Please enter your username: ', (username) => {
+        USERNAME = username; // Set the username
         callback(username);
     });
 }
@@ -46,7 +50,7 @@ client.on('error', err => {
     rl.close();
 });
 
-getUsername((USERNAME) => {
+getUsername((username) => {
     client.connect(PORT, HOST, () => {
         console.log('Connected to the chat server');
         console.log(`Username set as: ${USERNAME}`);
@@ -58,7 +62,7 @@ getUsername((USERNAME) => {
             clientVersionNumber: clientVersion,
             text: 'Initial message for authentication or other purposes'
         };
-        console.log('Sending initial message to server:', initialMessage);
+        // console.log('Sending initial message to server:', initialMessage); logging
         client.write(JSON.stringify(initialMessage) + '\r\n');
     });
 });

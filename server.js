@@ -5,7 +5,7 @@
 const net = require('net');
 
 const PORT = 8000;
-const ALLOWED_VERSION = "1.1.1";
+const ALLOWED_VERSION = "1.1.2";
 
 // Counter for generating unique client IDs
 let nextClientId = 1;

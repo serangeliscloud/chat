@@ -1,3 +1,7 @@
+### 03.04.2024, v1.1.2
+- removed logging message for `initial message` in client code
+- fixed username not defined upon leaving
+
 ### 03.04.2024, v1.1.1
 - (§) improved `user left the chat` message, now being sent actually from server
 - (§) version number for client now being readen from `package.json`
