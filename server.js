@@ -5,7 +5,7 @@
 const net = require('net');
 
 const PORT = 8000;
-const ALLOWED_VERSION = "1.1.0";
+const ALLOWED_VERSION = "1.1.1";
 
 // Counter for generating unique client IDs
 let nextClientId = 1;
@@ -41,6 +41,14 @@ function handleInitialMessage(message, clientSocket) {
     broadcast(joinMessage, clientSocket);
 }
 
+// Function to handle leaving messages from clients
+function handleExitingMessage(message, clientSocket) {
+    // Broadcast leave message to all clients
+    const leaveMessage = JSON.stringify({ sender: "Server", text: `${message.sender} left the chat` }) + '\r\n';
+    broadcast(leaveMessage, clientSocket);
+    console.log(`${message.sender} left the chat`);
+}
+
 // Create a TCP server
 const server = net.createServer(clientSocket => {
     // Generate a unique ID for the client
@@ -56,9 +64,7 @@ const server = net.createServer(clientSocket => {
         // Check if it's the initial message upon connection
         if (message.clientVersionNumber === ALLOWED_VERSION) {
             if (message.type === 'leaving') {
-                const leaveMessage = JSON.stringify({ sender: "Server", text: `${message.sender} left the chat` }) + '\r\n';
-                broadcast(leaveMessage, clientSocket);
-                console.log(message.sender, " left the chat")
+                handleExitingMessage(message, clientSocket);
             } else if (message.type === 'authentication') {
                 handleInitialMessage(message, clientSocket);
             } else {
@@ -77,7 +83,6 @@ const server = net.createServer(clientSocket => {
         if (index !== -1) {
             clients.splice(index, 1);
         }
-        
     });
 
     clientSocket.on('error', err => {
