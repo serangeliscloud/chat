@@ -5,7 +5,7 @@
 const net = require('net');
 
 const PORT = 8000;
-const ALLOWED_VERSION = "1.1.1";
+const ALLOWED_VERSION = "1.2.0";
 
 // Counter for generating unique client IDs
 let nextClientId = 1;
@@ -48,7 +48,22 @@ function handleExitingMessage(message, clientSocket) {
     broadcast(leaveMessage, clientSocket);
     console.log(`${message.sender} left the chat`);
 }
+function sendServerTime(clientSocket) {
+    const now = new Date();
 
+    // Get the current time components
+    const hours = now.getHours().toString().padStart(2, '0'); // Add leading zero if needed
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+
+    // Construct the time string in HH:MM:SS format
+    const timeString = `${hours}:${minutes}:${seconds}`;
+    const message = {
+        sender: "Server",
+        text: timeString,
+    };
+    clientSocket.write(JSON.stringify(message)+ '\r\n' )
+}
 // Create a TCP server
 const server = net.createServer(clientSocket => {
     // Generate a unique ID for the client
@@ -67,7 +82,13 @@ const server = net.createServer(clientSocket => {
                 handleExitingMessage(message, clientSocket);
             } else if (message.type === 'authentication') {
                 handleInitialMessage(message, clientSocket);
-            } else {
+            } else if (message.type === 'command') {
+                switch(message.command){
+                case "time":
+                    sendServerTime(clientSocket);   }
+            } 
+            
+            else {
                 // Broadcast the message to all clients
                 broadcast(data.toString(), clientSocket);
                 console.log(`${message.sender} - ${message.clientVersionNumber}:  ${message.text}`);

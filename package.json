@@ -1,6 +1,6 @@
 {
   "name": "chat",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "",
   "main": "client.js",
   "directories": {
@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/serangeliscloud/chat/issues"
   },
-  "homepage": "https://github.com/serangeliscloud/chat#readme"
+  "homepage": "https://github.com/serangeliscloud/chat#readme",
+  "dependencies": {
+    "crypto-js": "^4.2.0"
+  }
 }
