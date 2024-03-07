@@ -7,6 +7,8 @@ const fs = require('fs');
 
 const HOST = 'localhost';
 const PORT = 8000;
+const ENCRYPTIONPASSKEY = 516
+const CryptoJS = require('crypto-js');
 
 // Set up readline interface for user input
 const rl = readline.createInterface({
@@ -16,6 +18,23 @@ const rl = readline.createInterface({
 
 // Define username as a constant
 let USERNAME;
+
+// functions to encrypt and decrypt strings
+function encrypt(text) {
+    let encryptedText = "";
+    for (let i = 0; i < text.length; i++) {
+        encryptedText += String.fromCharCode(text.charCodeAt(i) + ENCRYPTIONPASSKEY);
+    }
+    return encryptedText;
+}
+
+function decrypt(encryptedText) {
+    let decryptedText = "";
+    for (let i = 0; i < encryptedText.length; i++) {
+        decryptedText += String.fromCharCode(encryptedText.charCodeAt(i) - ENCRYPTIONPASSKEY);
+    }
+    return decryptedText;
+}
 
 // Function to get username
 function getUsername(callback) {
@@ -35,7 +54,12 @@ const client = new net.Socket();
 // Event listener for receiving data from the server
 client.on('data', data => {
     const message = JSON.parse(data.toString());
-    console.log(`${message.sender}: ${message.text}`);
+    if (message.sender=== "Server"){
+        console.log(`${message.sender}: ${message.text}`);
+    }
+    else{
+    var decrypted = decrypt(message.text)
+    console.log(`${message.sender}: ${decrypted.toString()}`);}
 });
 
 // Event listener for server connection closed
@@ -82,9 +106,10 @@ rl.on('line', input => {
         client.write(JSON.stringify(message) + '\r\n');
     } else {
         // If not a command, treat it as a regular message
+        const encryptedText = encrypt(input) // Convert encrypted object to string
         const message = {
             sender: USERNAME,
-            text: input,
+            text: encryptedText, // Send the encrypted text instead of the encrypted object
             clientVersionNumber: clientVersion
         };
         // Send the JSON message to the server
