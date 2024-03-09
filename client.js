@@ -13,6 +13,7 @@ const hashValueEncryptionKey = calculateHash(ENCRYPTIONPASSKEY);
 
 
 
+
 // Set up readline interface for user input
 const rl = readline.createInterface({
     input: process.stdin,
