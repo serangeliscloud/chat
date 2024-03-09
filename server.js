@@ -5,7 +5,19 @@
 const net = require('net');
 
 const PORT = 8000;
-const ALLOWED_VERSION = "1.2.3";
+const ALLOWED_VERSION = "1.2.4";
+
+// ansi codes for colors
+const colors = {
+    reset: "\x1b[0m",
+    red: "\x1b[31m",
+    green: "\x1b[32m",
+    yellow: "\x1b[33m",
+    blue: "\x1b[34m",
+    magenta: "\x1b[35m",
+    cyan: "\x1b[36m",
+    white: "\x1b[37m"
+};
 
 // Counter for generating unique client IDs
 let nextClientId = 1;
@@ -27,13 +39,13 @@ function broadcast(message, sender) {
 function handleInitialMessage(message, clientSocket) {
     // Check if the client version matches the allowed version
     if (message.type === 'authentication' && message.clientVersionNumber !== ALLOWED_VERSION) {
-        console.log(`Connection from client with version ${message.clientVersionNumber} refused.`);
+        console.log(`Connection from client with version `+colors.yellow+`${message.clientVersionNumber}`+colors.reset+colors.red+` refused.`+colors.red);
         clientSocket.end(); // Close the connection immediately
         return;
     }
 
     // Handle the initial message based on its type or content
-    console.log(`Received initial message from ${message.sender} - client version: ${message.clientVersionNumber}`);
+    console.log(colors.green+`accepted connection from ${message.sender}`+colors.reset+` - client version: `+colors.yellow+`${message.clientVersionNumber}`+colors.reset);
     // You can authenticate the client, validate its version, etc.
 
     // Broadcast join message to all clients
@@ -46,7 +58,7 @@ function handleExitingMessage(message, clientSocket) {
     // Broadcast leave message to all clients
     const leaveMessage = JSON.stringify({ sender: "Server", text: `${message.sender} left the chat` }) + '\r\n';
     broadcast(leaveMessage, clientSocket);
-    console.log(`${message.sender} left the chat`);
+    console.log(message.usernameColor+`${message.sender}`+colors.reset+` left the chat`);
 }
 function sendServerTime(clientSocket) {
     const now = new Date();
@@ -89,10 +101,14 @@ const server = net.createServer(clientSocket => {
             } 
             
             else {
+                const messageSizeBytes = Buffer.byteLength(JSON.stringify(message), 'utf8');
+                const messageSizeMB = messageSizeBytes / (1024 * 1024); // Convert bytes to megabytes
                 // Broadcast the message to all clients
                 broadcast(data.toString(), clientSocket);
-                console.log(`${message.sender} - ${message.clientVersionNumber}:  ${message.text}`);
+                console.log(`${message.sender} - ${colors.yellow}${message.clientVersionNumber}:${colors.reset}  ${message.text} ${messageSizeMB} MB`);
             }
+            
+            
         } else {
             clientSocket.end(); // Close the connection immediately
         }
@@ -107,11 +123,11 @@ const server = net.createServer(clientSocket => {
     });
 
     clientSocket.on('error', err => {
-        console.error('Client error:', err);
+        console.error(colors.red+'Client error:', err+colors.reset);
     });
 });
 
 // Start listening for connections
 server.listen(PORT, () => {
-    console.log(`Chat server is running on port ${PORT}`);
+    console.log(`Chat server is running on port`+colors.yellow+` ${PORT}`+colors.reset);
 });
