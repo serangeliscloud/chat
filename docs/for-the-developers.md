@@ -17,6 +17,7 @@ The client-side component of the chat application (`client.js`) is responsible f
 
 #### Message Encryption and Decryption
 - The `encrypt` and `decrypt` functions handle encryption and decryption of messages using a predefined passkey.
+- if the predefined key is different across clients an error message will be shown stating that you can't see that message as the encryption key is not the same
 
 #### Event Listeners
 - Event listeners are set up to handle data, end, and error events from the server.

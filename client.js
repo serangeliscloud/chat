@@ -8,6 +8,10 @@ const fs = require('fs');
 const HOST = 'localhost';
 const PORT = 8000;
 const ENCRYPTIONPASSKEY = 516
+const crypto = require('crypto');
+const hashValueEncryptionKey = calculateHash(ENCRYPTIONPASSKEY);
+
+
 
 
 // Set up readline interface for user input
@@ -36,6 +40,27 @@ function decrypt(encryptedText) {
     return decryptedText;
 }
 
+// calculate sha256 section
+
+function calculateHash(integer) {
+    // Convert integer to string before hashing
+    const data = integer.toString();
+    
+    // Create hash object
+    const hash = crypto.createHash('sha256');
+    
+    // Update hash object with data
+    hash.update(data);
+    
+    // Calculate hash digest in hexadecimal format
+    const hashDigest = hash.digest('hex');
+    
+    return hashDigest;
+  }
+
+
+
+
 // Function to get username
 function getUsername(callback) {
     rl.question('Please enter your username: ', (username) => {
@@ -58,9 +83,12 @@ client.on('data', data => {
         console.log(`${message.sender}: ${message.text}`);
     }
     else{
-    var decrypted = decrypt(message.text)
-    console.log(`${message.sender}: ${decrypted.toString()}`);}
-});
+        if (message.publicEncryptioKey === hashValueEncryptionKey){
+            var decrypted = decrypt(message.text)
+            console.log(`${message.sender}: ${decrypted.toString()}`);}
+        else {
+            console.log(`${message.sender} is not using the same encryption key as you, you can't see this message.`)
+        }}});
 
 // Event listener for server connection closed
 client.on('end', () => {
@@ -101,6 +129,7 @@ rl.on('line', input => {
             type: 'command',
             command: input.slice(1), // Remove '!' from the text
             clientVersionNumber: clientVersion
+            
         };
         // Send the JSON message to the server
         client.write(JSON.stringify(message) + '\r\n');
@@ -109,8 +138,9 @@ rl.on('line', input => {
         const encryptedText = encrypt(input) // Convert encrypted object to string
         const message = {
             sender: USERNAME,
-            text: encryptedText, // Send the encrypted text instead of the encrypted object
-            clientVersionNumber: clientVersion
+            text: encryptedText, 
+            clientVersionNumber: clientVersion,
+            publicEncryptioKey: hashValueEncryptionKey
         };
         // Send the JSON message to the server
         client.write(JSON.stringify(message) + '\r\n');
