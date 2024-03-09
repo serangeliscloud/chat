@@ -130,7 +130,7 @@ client.on('error', err => {
 getUsername((username) => {
     client.connect(PORT, HOST, () => {
         console.log(colors.cyan+'Connected to the chat server'+colors.reset);
-        console.log(colors.green+`Username set as: ${USERNAME}`+colors.reset);
+        console.log(colors.green+`Username set as:`+colors.reset+userColor+` ${USERNAME}`+colors.reset);
 
         // Send an initial message to the server for client information gathering 
         const initialMessage = {
@@ -187,7 +187,8 @@ rl.on('SIGINT', () => {
         sender: USERNAME,
         type: 'leaving',
         clientVersionNumber: clientVersion,
-        text: `${USERNAME} left the chat`
+        text: `${USERNAME} left the chat`,
+        usernameColor: userColor
     };
     client.write(JSON.stringify(finalMessage) + '\r\n');
     client.end();

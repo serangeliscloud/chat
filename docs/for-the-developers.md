@@ -42,6 +42,7 @@ The server-side component (`server.js`) manages incoming client connections, han
 - The server listens for incoming data from clients and processes it accordingly.
 - Initial messages are authenticated, and their version is validated against the allowed version.
 - Regular messages are broadcasted to all connected clients, while command messages are executed accordingly.
+- everymessages size is measured and is now logged on server
 
 #### Broadcast Functionality
 - The `broadcast` function forwards messages from one client to all other connected clients, excluding the sender.
