@@ -13,6 +13,7 @@ The client-side component of the chat application (`client.js`) is responsible f
 
 #### User Input Handling
 - User input is captured from the command line interface using the `readline` module.
+- Empty messages are not allowed to be sent
 - Messages starting with '!' are treated as commands, while regular messages are encrypted and sent to the server.
 
 #### Message Encryption and Decryption

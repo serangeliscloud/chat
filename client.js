@@ -4,15 +4,12 @@
 const net = require('net');
 const readline = require('readline');
 const fs = require('fs');
+const crypto = require('crypto');
 
 const HOST = 'localhost';
 const PORT = 8000;
 const ENCRYPTIONPASSKEY = 516
-const crypto = require('crypto');
 const hashValueEncryptionKey = calculateHash(ENCRYPTIONPASSKEY);
-
-
-
 
 // Set up readline interface for user input
 const rl = readline.createInterface({
@@ -58,14 +55,19 @@ function calculateHash(integer) {
     return hashDigest;
   }
 
-
-
-
 // Function to get username
 function getUsername(callback) {
     rl.question('Please enter your username: ', (username) => {
-        USERNAME = username; // Set the username
-        callback(username);
+        // Check if the trimmed username is not an empty string
+        if (username.trim() !== '') {
+            USERNAME = username; // Set the username
+            callback(username);
+        } else {
+            // Handle case of empty or whitespace-only input
+            console.log('Invalid username. Please enter a non-empty username.');
+            // Ask for username again
+            getUsername(callback);
+        }
     });
 }
 
@@ -121,7 +123,10 @@ getUsername((username) => {
 
 // Event listener for user input
 rl.on('line', input => {
-    // Check if the input starts with '!'
+    
+    if (input.trim() !== ""){
+
+    // Check if the input starts with '!'    
     if (input.startsWith('!')) {
         // If it does, set message type as 'command'
         const message = {
@@ -145,7 +150,11 @@ rl.on('line', input => {
         // Send the JSON message to the server
         client.write(JSON.stringify(message) + '\r\n');
     }
-});
+    }
+    // if message is empty
+    else {
+        console.log("message cannot be an empty string")
+    }});
 
 
 // Handle Ctrl+C to gracefully disconnect from the server

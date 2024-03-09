@@ -1,3 +1,6 @@
+### 03.09.2024, v1.2.2
+- Empty messages and empty usernames are not allowed anymore.
+
 ### 03.09.2024, v1.2.1
 - added handling for different encryption keys across clients, now an error message is shown, this also allows for an ipothetical future private chatting feature by choosing unique encryption keys.
 
