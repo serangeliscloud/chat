@@ -11,6 +11,29 @@ const PORT = 8000;
 const ENCRYPTIONPASSKEY = 516
 const hashValueEncryptionKey = calculateHash(ENCRYPTIONPASSKEY);
 
+
+// ansi codes for colors
+const colors = {
+    reset: "\x1b[0m",
+    red: "\x1b[31m",
+    green: "\x1b[32m",
+    yellow: "\x1b[33m",
+    blue: "\x1b[34m",
+    magenta: "\x1b[35m",
+    cyan: "\x1b[36m",
+    white: "\x1b[37m"
+};
+
+// Function to get a random color
+function getRandomColor() {
+    const colorKeys = Object.keys(colors); // Get keys of the colors object
+    const randomIndex = Math.floor(Math.random() * (colorKeys.length - 1)); // Exclude reset key
+    return colors[colorKeys[randomIndex]]; // Get random color code
+}
+
+// Get a random color for the user
+const userColor = getRandomColor();
+
 // Set up readline interface for user input
 const rl = readline.createInterface({
     input: process.stdin,
@@ -64,7 +87,7 @@ function getUsername(callback) {
             callback(username);
         } else {
             // Handle case of empty or whitespace-only input
-            console.log('Invalid username. Please enter a non-empty username.');
+            console.log(colors.red+'Invalid username. Please enter a non-empty username.'+colors.reset);
             // Ask for username again
             getUsername(callback);
         }
@@ -82,32 +105,32 @@ const client = new net.Socket();
 client.on('data', data => {
     const message = JSON.parse(data.toString());
     if (message.sender=== "Server"){
-        console.log(`${message.sender}: ${message.text}`);
+        console.log(colors.cyan+`${message.sender}: ${message.text}`+colors.reset);
     }
     else{
         if (message.publicEncryptioKey === hashValueEncryptionKey){
             var decrypted = decrypt(message.text)
-            console.log(`${message.sender}: ${decrypted.toString()}`);}
+            console.log(message.usernameColor+`${message.sender}: `+colors.reset+`${decrypted.toString()}`);}
         else {
-            console.log(`${message.sender} is not using the same encryption key as you, you can't see this message.`)
+            console.log(message.usernameColor+`${message.sender} `+colors.reset+`is not using the same encryption key as you, you can't see this message.`)
         }}});
 
 // Event listener for server connection closed
 client.on('end', () => {
-    console.log('Disconnected from the chat server');
+    console.log(colors.red+'Disconnected from the chat server'+colors.reset);
     rl.close();
 });
 
 // Event listener for client error
 client.on('error', err => {
-    console.error('Client error:', err);
+    console.error(colors.red+'Client error:', err+colors.reset);
     rl.close();
 });
 
 getUsername((username) => {
     client.connect(PORT, HOST, () => {
-        console.log('Connected to the chat server');
-        console.log(`Username set as: ${USERNAME}`);
+        console.log(colors.cyan+'Connected to the chat server'+colors.reset);
+        console.log(colors.green+`Username set as: ${USERNAME}`+colors.reset);
 
         // Send an initial message to the server for client information gathering 
         const initialMessage = {
@@ -145,7 +168,8 @@ rl.on('line', input => {
             sender: USERNAME,
             text: encryptedText, 
             clientVersionNumber: clientVersion,
-            publicEncryptioKey: hashValueEncryptionKey
+            publicEncryptioKey: hashValueEncryptionKey,
+            usernameColor: userColor
         };
         // Send the JSON message to the server
         client.write(JSON.stringify(message) + '\r\n');
@@ -153,7 +177,7 @@ rl.on('line', input => {
     }
     // if message is empty
     else {
-        console.log("message cannot be an empty string")
+        console.log(colors.red+"message cannot be an empty string"+colors.reset)
     }});
 
 

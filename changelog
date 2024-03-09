@@ -1,3 +1,7 @@
+### 03.09.2024, v1.2.3
+- added colors for clarity in reading input
+- username's colors are now randomly chosen on connection
+
 ### 03.09.2024, v1.2.2
 - Empty messages and empty usernames are not allowed anymore.
 
