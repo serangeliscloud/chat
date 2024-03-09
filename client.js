@@ -8,7 +8,7 @@ const fs = require('fs');
 const HOST = 'localhost';
 const PORT = 8000;
 const ENCRYPTIONPASSKEY = 516
-const CryptoJS = require('crypto-js');
+
 
 // Set up readline interface for user input
 const rl = readline.createInterface({
