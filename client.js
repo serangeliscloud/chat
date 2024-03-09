@@ -9,6 +9,7 @@ const HOST = 'localhost';
 const PORT = 8000;
 const ENCRYPTIONPASSKEY = 516
 
+
 // Set up readline interface for user input
 const rl = readline.createInterface({
     input: process.stdin,
