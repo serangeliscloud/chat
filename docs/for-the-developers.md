@@ -1,4 +1,3 @@
-To rewrite the documentation for the chat application code, let's structure it in a more organized and descriptive manner. We'll provide detailed explanations for both the client-side (`client.js`) and server-side (`server.js`) components, highlighting their functionalities and interactions.
 
 ### Client Component (`client.js`)
 
@@ -43,6 +42,12 @@ The server-side component (`server.js`) manages incoming client connections, han
 - Initial messages are authenticated, and their version is validated against the allowed version.
 - Regular messages are broadcasted to all connected clients, while command messages are executed accordingly.
 - everymessages size is measured and is now logged on server
+
+### Media
+- Files sent by the client are downloaded in the `savedFiles folder` as JSON files. 
+- The files are nominated with a `username_UUID.json` format when received from the client
+- Files contain `sender`, `fileName`, `fileExtension`, `fileData`.
+- All this information except the sender will be returned when requested from a client. 
 
 #### Broadcast Functionality
 - The `broadcast` function forwards messages from one client to all other connected clients, excluding the sender.
