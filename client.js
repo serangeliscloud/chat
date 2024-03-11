@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+
 
 // client.js
 const net = require('net');
