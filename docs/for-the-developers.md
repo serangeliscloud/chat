@@ -16,6 +16,13 @@ The client-side component of the chat application (`client.js`) is responsible f
 - Empty messages are not allowed to be sent
 - Messages starting with '!' are treated as commands, while regular messages are encrypted and sent to the server.
 
+### Media
+- You can upload files to the server by using this format `!sendFile [filePath]`
+- the file's binaries are converted to Base64 in order to allow for better compatability across different systems.
+- Files will be uploaded to the server and a message will be shown to you specifying the path were it has been uploaded.
+- You can use this path to share the messages with your friends who can download the files by tiping `!downloadFile [filePath]` (remeber paths must include the `.json` extension, this will not compromise the file extension of the downloaded file at all)
+- Files will be downloaded in the `ClientDownloads` folder.
+
 #### Message Encryption and Decryption
 - The `encrypt` and `decrypt` functions handle encryption and decryption of messages using a predefined passkey.
 - if the predefined key is different across clients an error message will be shown stating that you can't see that message as the encryption key is not the same
