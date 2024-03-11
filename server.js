@@ -2,9 +2,10 @@
 // server.js
 
 const net = require('net');
+const fs = require('fs');
 
 const PORT = 8000;
-const ALLOWED_VERSION = "1.2.4";
+const ALLOWED_VERSION = "1.3.0";
 
 // ansi codes for colors
 const colors = {
@@ -23,6 +24,14 @@ let nextClientId = 1;
 
 // Array to hold connected clients, each with an ID
 const clients = [];
+
+function generateUUID() {
+    // Generate a random hexadecimal string of length 8 characters
+    const s4 = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+
+    // Construct the UUID
+    return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
+}
 
 // Function to broadcast messages to all clients
 function broadcast(message, sender) {
@@ -75,6 +84,68 @@ function sendServerTime(clientSocket) {
     };
     clientSocket.write(JSON.stringify(message)+ '\r\n' )
 }
+
+function saveFile(message, clientSocket) {
+    // Create the directory if it doesn't exist
+    const folderPath = './savedFiles';
+    if (!fs.existsSync(folderPath)) {
+        fs.mkdirSync(folderPath);
+    }
+    const uuid = generateUUID()
+    // Generate a unique filename using sender name and file extension
+    const fileName = `${message.sender}_${uuid}.json`;
+
+    // Construct the file path
+    const filePath = `${folderPath}/${fileName}`;
+
+    // Write the file data to a JSON file
+    const jsonData = {
+        sender: message.sender,
+        fileName: `${message.sender}_${uuid}`,
+        fileExtension: message.fileExtension,
+        fileData: message.fileData
+
+    };
+
+    fs.writeFile(filePath, JSON.stringify(jsonData), (err) => {
+        if (err) {
+            console.error(`Error saving file: ${err}`);
+        } else {
+            console.log(`File saved successfully: ${filePath}`);
+        }
+    });
+    broadcastMessage = {
+        sender: "Server",
+        text: `message saved succesfully at ${filePath}`
+    }
+    clientSocket.write(JSON.stringify(broadcastMessage))
+}
+
+// Function to send file contents to client
+function sendFileContents(filePath, clientSocket) {
+    // console.log(colors.magenta+"senfFileContents function started"+colors.reset)
+    try {
+        const fileContents = fs.readFileSync(filePath, 'utf8');
+        const fileInfo = JSON.parse(fileContents);
+        const fileData = fileInfo.fileData
+        const fileExtension = fileInfo.fileExtension
+        const fileName = fileInfo.fileName
+        const message = {
+            sender: "Server",
+            type: 'fileContents',
+            contents: fileData,
+            fileName: fileName, 
+            fileExtension: fileExtension
+        };
+        // console.log(message.contents)
+        console.log(`${filePath} sent`)
+        clientSocket.write(JSON.stringify(message) + '\r\n');
+    } catch (error) {
+        console.error("Error occurred while reading file:", error);
+        // Handle the error as needed, e.g., send an error message to the client
+    }
+}
+
 // Create a TCP server
 const server = net.createServer(clientSocket => {
     // Generate a unique ID for the client
@@ -96,7 +167,20 @@ const server = net.createServer(clientSocket => {
             } else if (message.type === 'command') {
                 switch(message.command){
                 case "time":
-                    sendServerTime(clientSocket);   }
+                    sendServerTime(clientSocket);
+                    break
+                case "sendFile":
+                    console.log("send file case")
+                    saveFile(message, clientSocket)
+                    
+                    break
+                case "downloadFile":
+                    // console.log(colors.magenta+"downloadFile command received"+colors.reset)
+                    sendFileContents(message.filePath, clientSocket);
+                    break;
+                     }
+                    
+                
             } 
             
             else {
