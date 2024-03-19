@@ -5,7 +5,7 @@ const net = require('net');
 const fs = require('fs');
 
 const PORT = 8000;
-const ALLOWED_VERSION = "1.3.0";
+const ALLOWED_VERSION = "1.3.1";
 
 // ansi codes for colors
 const colors = {

@@ -85,9 +85,9 @@ function fileToBase64(filePath) {
         // console.log('File read successfully');
 
         // Convert file data to Base64
-        const base64Data = fileData.toString('base64');
+        const base64Dat = fileData.toString('base64');
         // console.log('File converted to Base64:', base64Data);
-
+        const base64Data = encrypt(base64Dat)  //encrypt base64Data
         return base64Data;
     } catch (error) {
         console.error("Error occurred while converting file to Base64:", error);
@@ -114,7 +114,7 @@ function base64ToFile(message) {
             if (!fs.existsSync(folderPath)) {
                 fs.mkdirSync(folderPath);
             }
-            const base64Data = message.contents
+            const base64Data = decrypt(message.contents) // decrypt contents received from server
             const filePath = `./ClientDownloads/${message.fileName}${message.fileExtension}`
             // Convert Base64 to binary data
             const binaryData = Buffer.from(base64Data, 'base64');
