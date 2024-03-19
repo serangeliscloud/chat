@@ -18,6 +18,7 @@ The client-side component of the chat application (`client.js`) is responsible f
 ### Media
 - You can upload files to the server by using this format `!sendFile [filePath]`
 - the file's binaries are converted to Base64 in order to allow for better compatability across different systems.
+- The file's are encrypted and decrypted using the same functions as normal messages
 - Files will be uploaded to the server and a message will be shown to you specifying the path were it has been uploaded.
 - You can use this path to share the messages with your friends who can download the files by tiping `!downloadFile [filePath]` (remeber paths must include the `.json` extension, this will not compromise the file extension of the downloaded file at all)
 - Files will be downloaded in the `ClientDownloads` folder.
