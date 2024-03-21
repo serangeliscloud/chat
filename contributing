@@ -1,0 +1,41 @@
+# Contributing Guidelines
+
+Thank you for considering contributing to the chat server and client project! Contributions from developers like you help make this project better. Here are a few guidelines to follow when contributing:
+
+## How Can I Contribute?
+
+1. Reporting Bugs: If you encounter any bugs or unexpected behavior while using the chat server or client, please open an issue on the GitHub repository. When reporting a bug, please provide detailed steps to reproduce the issue and any relevant error messages or screenshots.
+
+2. Submitting Enhancements: If you have an idea for a new feature or an improvement to existing functionality, feel free to open an issue to discuss your proposal. You can also submit a pull request with your changes. Make sure to provide a clear description of the enhancement and any relevant context or documentation updates.
+
+3. Code Contributions: We welcome code contributions to fix bugs, implement new features, or improve the overall code quality. When submitting a pull request, please follow the coding conventions and maintain a clean commit history with descriptive commit messages.
+
+## Getting Started
+
+1. Fork the Repository: If you haven't already, fork the chat server and client repository on GitHub to create your own copy of the project.
+
+2. Set Up Your Development Environment: Follow the installation instructions in the README.md file to set up the project on your local machine.
+
+3. Make Changes: Implement your changes or fixes in your forked repository. Make sure to test your changes locally to ensure they work as expected.
+
+4. Submit a Pull Request: Once you're ready, submit a pull request from your forked repository to the main repository. Provide a clear description of your changes and reference any related issues or discussions.
+
+## Code Style
+
+- Follow the existing code style and formatting conventions used throughout the project.
+- Maintain consistency with variable names, function names, and coding patterns.
+- Write clear and concise code with appropriate comments where necessary to explain complex logic or implementation details.
+
+## Code Review
+
+All pull requests will undergo code review before being merged. During code review, contributors may receive feedback on their changes and suggestions for improvement. Please be open to feedback and be prepared to make necessary adjustments to your code.
+
+## License
+
+By contributing to this project, you agree that your contributions will be licensed under the MIT License. Make sure to include appropriate license headers for any new files you create or modifications you make to existing files.
+
+## Need Help?
+
+If you have any questions about contributing or need assistance with the project setup, feel free to reach out to the project maintainers or open an issue on GitHub for help.
+
+Thank you for contributing to the chat server and client project!
