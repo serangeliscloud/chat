@@ -1,3 +1,9 @@
+### 03.21.2024, v1.3.3
+- added gitignore
+
+### 03.21.2024, v1.3.2
+- added contributing guidelines
+
 ### 03.19.2024, v1.3.1
 - added encryption for file sharing
 - fixed typo in `package.json`
