@@ -1,0 +1,14 @@
+# Ignore node_modules directory
+node_modules/
+
+# Ignore any files in the ClientDownloads directory
+ClientDownloads/*
+
+# Ignore any files in the savedFiles directory
+savedFiles/*
+
+# Ignore any log files
+*.log
+
+# Ignore any temporary files
+*.tmp
