@@ -7,6 +7,9 @@ ClientDownloads/*
 # Ignore any files in the savedFiles directory
 savedFiles/*
 
+#ignore any files in usr
+usr/*
+
 # Ignore any log files
 *.log
 

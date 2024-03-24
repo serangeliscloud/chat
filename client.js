@@ -141,16 +141,113 @@ function fileExists(filePath) {
 
 // Function to get username
 function getUsername(callback) {
+    const userInfoPath = './usr/userInfo.json'; // Path to the userInfo.json file
+
+    // Check if userInfo.json file exists
+    if (fs.existsSync(userInfoPath)) {
+        // If the file exists, read the username from it
+        fs.readFile(userInfoPath, 'utf8', (err, data) => {
+            if (err) {
+                console.error("Error reading userInfo.json file:", err);
+                // Prompt the user to enter the username manually
+                askForUsername(callback);
+            } else {
+                try {
+                    const userInfo = JSON.parse(data);
+                    const username = userInfo.username.trim(); // Trim whitespace from the username
+                    if (username !== '') {
+                        // Username exists in the file and is not empty
+                        USERNAME = username;
+                        console.log("Username loaded from userInfo.json:",userColor, USERNAME, colors.reset);
+                        callback(USERNAME);
+                    } else {
+                        // Username in the file is empty, ask for username manually
+                        askForUsername(callback);
+                    }
+                } catch (parseError) {
+                    console.error("Error parsing userInfo.json:", parseError);
+                    // Prompt the user to enter the username manually
+                    askForUsername(callback);
+                }
+            }
+        });
+    } else {
+        // If userInfo.json file doesn't exist, create it and ask for username manually
+        const initialUserInfo = { username: '' }; // Initial user info object
+        fs.mkdir('./usr', { recursive: true }, (err) => {
+            if (err) {
+                console.error("Error creating usr directory:", err);
+                // Prompt the user to enter the username manually
+                askForUsername(callback);
+            } else {
+                // Write initial user info to userInfo.json
+                fs.writeFile(userInfoPath, JSON.stringify(initialUserInfo), (writeErr) => {
+                    if (writeErr) {
+                        console.error("Error writing userInfo.json file:", writeErr);
+                    } else {
+                        // console.log("userInfo.json file created.");
+                    }
+                    // Ask for username manually
+                    askForUsername(callback);
+                });
+            }
+        });
+    }
+}
+
+// Function to ask for username manually
+function askForUsername(callback) {
     rl.question('Please enter your username: ', (username) => {
-        // Check if the trimmed username is not an empty string
         if (username.trim() !== '') {
-            USERNAME = username; // Set the username
+            // If the user enters a non-empty username
+            USERNAME = username;
+            const userInfo = { username: USERNAME }; // User info object to be written to userInfo.json
+            // Save the username to userInfo.json
+            fs.writeFile('./usr/userInfo.json', JSON.stringify(userInfo), (err) => {
+                if (err) {
+                    console.error("Error writing userInfo.json file:", err);
+                } else {
+                    // console.log("Username saved to userInfo.json file.");
+                }
+            });
             callback(username);
         } else {
             // Handle case of empty or whitespace-only input
             console.log(colors.red + 'Invalid username. Please enter a non-empty username.' + colors.reset);
             // Ask for username again
-            getUsername(callback);
+            askForUsername(callback);
+        }
+    });
+}
+
+// Function to handle SetStatus command
+function setStatus(status) {
+    const userInfoPath = './usr/userInfo.json'; // Path to the userInfo.json file
+
+    // Read existing user info from the file
+    fs.readFile(userInfoPath, 'utf8', (err, data) => {
+        if (err) {
+            console.error("Error reading userInfo.json file:", err);
+        } else {
+            try {
+                // Parse the existing user info
+                const userInfo = JSON.parse(data);
+                // Update the status
+                userInfo.status = status;
+
+                // Write the updated user info back to the file
+                fs.writeFile(userInfoPath, JSON.stringify(userInfo), (writeErr) => {
+                    if (writeErr) {
+                        console.error("Error writing userInfo.json file:", writeErr);
+                    } else {
+                        console.log("Status updated successfully:", status);
+                        // Send initial message with updated status
+                        sendInitialMessage();
+                    }
+                });
+            } catch (parseError) {
+                console.error("Error parsing userInfo.json:", parseError);
+            }
         }
     });
 }
@@ -194,22 +291,46 @@ client.on('error', err => {
     rl.close();
 });
 
+// Function to send the initial message with status
+function sendInitialMessage() {
+    // Read status from userInfo.json file
+    const userInfoPath = './usr/userInfo.json';
+    fs.readFile(userInfoPath, 'utf8', (err, data) => {
+        if (err) {
+            console.error("Error reading userInfo.json file:", err);
+        } else {
+            try {
+                const userInfo = JSON.parse(data);
+                const status = userInfo.status;
+                // Create initial message with status
+                const initialMessage = {
+                    sender: USERNAME,
+                    type: 'authentication',
+                    clientVersionNumber: clientVersion,
+                    text: 'Initial message for authentication or other purposes',
+                    status: status  // Include status in the message
+                };
+                // Send the initial message to the server
+                client.write(JSON.stringify(initialMessage) + '\r\n');
+            } catch (parseError) {
+                console.error("Error parsing userInfo.json:", parseError);
+            }
+        }
+    });
+}
+
+// Get username and status
 getUsername((username) => {
+    // Connect to the server
     client.connect(PORT, HOST, () => {
         console.log(colors.cyan + 'Connected to the chat server' + colors.reset);
         console.log(colors.green + `Username set as:` + colors.reset + userColor + ` ${USERNAME}` + colors.reset);
 
-        // Send an initial message to the server for client information gathering 
-        const initialMessage = {
-            sender: USERNAME,
-            type: 'authentication',
-            clientVersionNumber: clientVersion,
-            text: 'Initial message for authentication or other purposes'
-        };
-        // console.log('Sending initial message to server:', initialMessage); logging
-        client.write(JSON.stringify(initialMessage) + '\r\n');
+        // Send initial message with status
+        sendInitialMessage();
     });
-});rl.on('line', input => {
+});
+rl.on('line', input => {
     // Trim input to remove leading and trailing whitespace
     input = input.trim();
 
@@ -300,6 +421,14 @@ getUsername((username) => {
                             client.write(JSON.stringify(message) + '\r\n');
                         } else {
                             console.log("Missing username for getClientVersion command."); // Corrected error message
+                        }
+                        break;
+                        case "SetStatus":
+                        const status = args.join(' '); // Join all arguments into a single string
+                        if (status) {
+                            setStatus(status);
+                        } else {
+                            console.log("Missing status for SetStatus command.");
                         }
                         break;
                 default:
