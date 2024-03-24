@@ -51,9 +51,9 @@ function handleInitialMessage(message, clientSocket) {
         clientSocket.end(); // Close the connection immediately
         return;
     }
-    dataForClientsArray = {UserID: (clients.length+1), Username: message.sender, Version: message.clientVersionNumber, SOCKET: clientSocket}
+    dataForClientsArray = {UserID: (clients.length+1), Username: message.sender, Version: message.clientVersionNumber, status: message.status, SOCKET: clientSocket}
     clientsList.push(dataForClientsArray)
-    console.log(clientsList)//  debug - show all connected clients + the one just connected
+    // console.log(clientsList)//  debug - show all connected clients + the one just connected
     // Handle the initial message based on its type or content
     console.log(colors.green+`accepted connection from ${message.sender}`+colors.reset+` - client version: `+colors.yellow+`${message.clientVersionNumber}`+colors.reset);
     // You can authenticate the client, validate its version, etc.

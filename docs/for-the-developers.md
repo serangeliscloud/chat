@@ -9,7 +9,9 @@ The client-side component of the chat application (`client.js`) is responsible f
 
 #### Establishing Connection
 - The client connects to the server using the specified host and port (`HOST` and `PORT` constants).
-
+- If `usr/userInfo.json` does not exist or username is empty the user will be prompted to choose a username and a `usr/userInfo.json` file will be created. 
+#### status
+- A user's status can be modified either from the `usr/userInfo.json` file or using the command `SetStatus` followed by the status you want to set
 #### User Input Handling
 - User input is captured from the command line interface using the `readline` module.
 - Empty messages are not allowed to be sent
@@ -44,7 +46,8 @@ The server-side component (`server.js`) manages incoming client connections, han
 #### Client Connection Handling
 - The server creates a TCP server that listens for incoming client connections.
 - Upon connection, each client is assigned a unique ID and added to the list of connected clients.
-- Upon connection, each client is assigned a Unique ID and added to the `ClientsList`to then be used for commands
+- Upon connection, each client is assigned a Unique ID and all the informations in the `initial message` are added to the `ClientsList` to then be used for commands.
+
 
 #### Message Handling
 - The server listens for incoming data from clients and processes it accordingly.
