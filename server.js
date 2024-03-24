@@ -5,7 +5,7 @@ const net = require('net');
 const fs = require('fs');
 
 const PORT = 8000;
-const ALLOWED_VERSION = "1.3.3";
+const ALLOWED_VERSION = "1.4.1";
 
 // ansi codes for colors
 const colors = {
@@ -21,9 +21,9 @@ const colors = {
 
 // Counter for generating unique client IDs
 let nextClientId = 1;
-
+const clients = []
 // Array to hold connected clients, each with an ID
-const clients = [];
+var clientsList = [];
 
 function generateUUID() {
     // Generate a random hexadecimal string of length 8 characters
@@ -51,7 +51,9 @@ function handleInitialMessage(message, clientSocket) {
         clientSocket.end(); // Close the connection immediately
         return;
     }
-
+    dataForClientsArray = {UserID: (clients.length+1), Username: message.sender, Version: message.clientVersionNumber, SOCKET: clientSocket}
+    clientsList.push(dataForClientsArray)
+    console.log(clientsList)//  debug - show all connected clients + the one just connected
     // Handle the initial message based on its type or content
     console.log(colors.green+`accepted connection from ${message.sender}`+colors.reset+` - client version: `+colors.yellow+`${message.clientVersionNumber}`+colors.reset);
     // You can authenticate the client, validate its version, etc.
@@ -63,11 +65,56 @@ function handleInitialMessage(message, clientSocket) {
 
 // Function to handle leaving messages from clients
 function handleExitingMessage(message, clientSocket) {
+    // Remove the client from the clientsList array based on message.sender
+    clientsList = clientsList.filter(function(client) {
+        return client.Username !== message.sender;
+    });
+
     // Broadcast leave message to all clients
     const leaveMessage = JSON.stringify({ sender: "Server", text: `${message.sender} left the chat` }) + '\r\n';
     broadcast(leaveMessage, clientSocket);
-    console.log(message.usernameColor+`${message.sender}`+colors.reset+` left the chat`);
+    console.log(message.usernameColor + `${message.sender}` + colors.reset + ` left the chat`);
+
+    // console.log("Updated clients list:", clientsList); debug - show all connected clients - the one that just disconnected
 }
+
+
+function GetClientIDByUsername(username, clientSocket) {
+    // Iterate through the clientsList array to find the client with the matching username
+    for (var i = 0; i < clientsList.length; i++) {
+        if (clientsList[i].Username === username) {
+            // Return the UserID of the matching client
+            const message = {
+                sender: "Server",
+                text: username +"'s clientID: "+clientsList[i].UserID,
+            };
+            clientSocket.write(JSON.stringify(message)+ '\r\n' )
+            return clientsList[i].UserID;
+        }
+    }
+    // If the username is not found, return null or any other appropriate value
+    return null;
+}
+
+function GetVersionByUsername(username, clientSocket) {
+    // Iterate through the clientsList array to find the client with the matching username
+    for (var i = 0; i < clientsList.length; i++) {
+        if (clientsList[i].Username === username) {
+            // Return the UserID of the matching client
+            console.log(clientsList[i].Version)
+            const message = {
+                sender: "Server",
+                text: username +"'s clientVersion: "+clientsList[i].Version,
+            };
+            clientSocket.write(JSON.stringify(message)+ '\r\n' )
+            return clientsList[i].UserID;
+        }
+    }
+    // If the username is not found, return null or any other appropriate value
+    console.log("username not found")
+    return null;
+}
+
 function sendServerTime(clientSocket) {
     const now = new Date();
 
@@ -178,9 +225,13 @@ const server = net.createServer(clientSocket => {
                     // console.log(colors.magenta+"downloadFile command received"+colors.reset)
                     sendFileContents(message.filePath, clientSocket);
                     break;
-                     }
-                    
-                
+                     
+                case "getClientID":
+                    GetClientIDByUsername(message.requestedUsername, clientSocket)
+                    break;
+                case "getClientVersion":
+                    GetVersionByUsername(message.requestedUsername, clientSocket)
+                }
             } 
             
             else {

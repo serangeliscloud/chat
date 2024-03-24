@@ -272,6 +272,36 @@ getUsername((username) => {
                         console.log("Missing arguments for !downloadFile command.");
                     }
                     break;
+                    case "ClientID":
+                        const [requestedUsernameCID] = args; // Rename the variable
+                        if (requestedUsernameCID) {
+                            const message = {
+                                sender: USERNAME,
+                                type: 'command',
+                                command: 'getClientID',
+                                requestedUsername: requestedUsernameCID, // Use the renamed variable here
+                                clientVersionNumber: clientVersion
+                            };
+                            client.write(JSON.stringify(message) + '\r\n');
+                        } else {
+                            console.log("Missing username for getClientID command.");
+                        }
+                        break;
+                    case "ClientVersion":
+                        const [requestedUsernameCV] = args; // Rename the variable
+                        if (requestedUsernameCV) {
+                            const message = {
+                                sender: USERNAME,
+                                type: 'command',
+                                command: 'getClientVersion', // This should be 'getClientVersion'
+                                requestedUsername: requestedUsernameCV, // Use the renamed variable here
+                                clientVersionNumber: clientVersion
+                            };
+                            client.write(JSON.stringify(message) + '\r\n');
+                        } else {
+                            console.log("Missing username for getClientVersion command."); // Corrected error message
+                        }
+                        break;
                 default:
                     console.log("Unknown command.");
             }

@@ -1,3 +1,8 @@
+### 03.24.2024, v1.4.0
+- moved contributing to docs
+- now client informations are saved in `clientsList` on connection and removed on disconnection
+- added commands to get informations about connected Clients
+
 ### 03.21.2024, v1.3.3
 - added gitignore
 

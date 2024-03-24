@@ -44,6 +44,7 @@ The server-side component (`server.js`) manages incoming client connections, han
 #### Client Connection Handling
 - The server creates a TCP server that listens for incoming client connections.
 - Upon connection, each client is assigned a unique ID and added to the list of connected clients.
+- Upon connection, each client is assigned a Unique ID and added to the `ClientsList`to then be used for commands
 
 #### Message Handling
 - The server listens for incoming data from clients and processes it accordingly.
@@ -51,11 +52,16 @@ The server-side component (`server.js`) manages incoming client connections, han
 - Regular messages are broadcasted to all connected clients, while command messages are executed accordingly.
 - everymessages size is measured and is now logged on server
 
+#### User Info Commands
+- ClientVersion when the command message is received `server.js` looks for the user's "dictionary" in the `ClientsList` and returns the Client Version associated to it.
+- ClientID when the command message is received `server.js` looks for the user's "dictionary" in the `ClientsList` and returns it's Client ID.
+
 ### Media
 - Files sent by the client are downloaded in the `savedFiles folder` as JSON files. 
 - The files are nominated with a `username_UUID.json` format when received from the client
 - Files contain `sender`, `fileName`, `fileExtension`, `fileData`.
 - All this information except the sender will be returned when requested from a client. 
+
 
 #### Broadcast Functionality
 - The `broadcast` function forwards messages from one client to all other connected clients, excluding the sender.
