@@ -252,6 +252,21 @@ function setStatus(status) {
     });
 }
 
+// Function to handle reload command
+function reloadConnection() {
+    console.log(colors.yellow + 'Reloading connection to the server...' + colors.reset);
+    client.end(); // Close the current connection
+
+    // Reconnect to the server
+    client.connect(PORT, HOST, () => {
+        console.log(colors.cyan + 'Reloaded connection to the chat server' + colors.reset);
+        console.log(colors.green + `Username set as:` + colors.reset + userColor + ` ${USERNAME}` + colors.reset);
+
+        // Send initial message with status after reloading connection
+        sendInitialMessage();
+    });
+}
+
 // Read client version number from package.json
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 const clientVersion = packageJson.version;
@@ -423,6 +438,21 @@ rl.on('line', input => {
                             console.log("Missing username for getClientVersion command."); // Corrected error message
                         }
                         break;
+                        case "GetClientStatus":
+                            const [requestedUsernameCS] = args; // Rename the variable
+                            if (requestedUsernameCS) {
+                                const message = {
+                                    sender: USERNAME,
+                                    type: 'command',
+                                    command: 'GetClientStatus', // This should be 'getClientVersion'
+                                    requestedUsername: requestedUsernameCS, // Use the renamed variable here
+                                    clientVersionNumber: clientVersion
+                                };
+                                client.write(JSON.stringify(message) + '\r\n');
+                            } else {
+                                console.log("Missing username for getClientVersion command."); // Corrected error message
+                            }
+                            break;
                         case "SetStatus":
                         const status = args.join(' '); // Join all arguments into a single string
                         if (status) {
@@ -431,6 +461,9 @@ rl.on('line', input => {
                             console.log("Missing status for SetStatus command.");
                         }
                         break;
+                        case "Reload":
+                            reloadConnection()
+                            break;
                 default:
                     console.log("Unknown command.");
             }
