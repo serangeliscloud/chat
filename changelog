@@ -1,3 +1,8 @@
+### 03.25.2024, readability improvements
+- changed code structure
+- changed indentation
+- added `GetStatus` to for-developers
+- changed the command `GetClientStatus` to `GetStatus`
 ### 03.25.2024, v1.4.2
 - created a command to reload your connection
 - created a `GetStatus` command to get someone's status

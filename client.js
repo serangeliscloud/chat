@@ -1,6 +1,9 @@
 
 
 // client.js
+
+// global constants
+
 const net = require('net');
 const readline = require('readline');
 const fs = require('fs');
@@ -10,6 +13,7 @@ const HOST = 'localhost';
 const PORT = 8000;
 const ENCRYPTIONPASSKEY = 516;
 const hashValueEncryptionKey = calculateHash(ENCRYPTIONPASSKEY);
+
 
 // ansi codes for colors
 const colors = {
@@ -22,6 +26,16 @@ const colors = {
     cyan: "\x1b[36m",
     white: "\x1b[37m"
 };
+const userColor = getRandomColor();
+// Set up readline interface for user input
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+// Define username as a constant
+let USERNAME;
+
+// functions
 
 // Function to get a random color
 function getRandomColor() {
@@ -30,17 +44,6 @@ function getRandomColor() {
     return colors[colorKeys[randomIndex]]; // Get random color code
 }
 
-// Get a random color for the user
-const userColor = getRandomColor();
-
-// Set up readline interface for user input
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
-// Define username as a constant
-let USERNAME;
 
 // functions to encrypt and decrypt strings
 function encrypt(text) {
@@ -63,16 +66,12 @@ function decrypt(encryptedText) {
 function calculateHash(integer) {
     // Convert integer to string before hashing
     const data = integer.toString();
-
-    // Create hash object
     const hash = crypto.createHash('sha256');
 
     // Update hash object with data
     hash.update(data);
-
     // Calculate hash digest in hexadecimal format
     const hashDigest = hash.digest('hex');
-
     return hashDigest;
 }
 
@@ -93,17 +92,6 @@ function fileToBase64(filePath) {
         console.error("Error occurred while converting file to Base64:", error);
         return null;
     }
-}
-
-function requestDownloadFile(filePath) {
-    const message = {
-        sender: USERNAME,
-        type: 'command',
-        command: 'downloadFile',
-        filePath: filePath,
-        clientVersionNumber: clientVersion
-    };
-    client.write(JSON.stringify(message) + '\r\n');
 }
 
 // Function to convert Base64 to file
@@ -438,7 +426,7 @@ rl.on('line', input => {
                             console.log("Missing username for getClientVersion command."); // Corrected error message
                         }
                         break;
-                        case "GetClientStatus":
+                        case "GetStatus":
                             const [requestedUsernameCS] = args; // Rename the variable
                             if (requestedUsernameCS) {
                                 const message = {

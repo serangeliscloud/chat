@@ -14,7 +14,7 @@ The client-side component of the chat application (`client.js`) is responsible f
 
 #### status
 - A user's status can be modified either from the `usr/userInfo.json` file or using the command `SetStatus` followed by the status you want to set
-
+- You can read a user's status by using `!GetStatus`
 #### User Input Handling
 - User input is captured from the command line interface using the `readline` module.
 - Empty messages are not allowed to be sent
