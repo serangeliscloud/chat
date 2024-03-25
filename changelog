@@ -1,3 +1,7 @@
+### 03.25.2024, v1.4.2
+- created a command to reload your connection
+- created a `GetStatus` command to get someone's status
+
 ### 03.24.2024, v1.4.1
 - username now loaded from `usr/userInfo.json`
 - added status handling in initial message

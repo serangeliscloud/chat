@@ -10,8 +10,11 @@ The client-side component of the chat application (`client.js`) is responsible f
 #### Establishing Connection
 - The client connects to the server using the specified host and port (`HOST` and `PORT` constants).
 - If `usr/userInfo.json` does not exist or username is empty the user will be prompted to choose a username and a `usr/userInfo.json` file will be created. 
+- connection can be reloaded by typing `!Reload` to update your connection (like for example your status or your username)
+
 #### status
 - A user's status can be modified either from the `usr/userInfo.json` file or using the command `SetStatus` followed by the status you want to set
+
 #### User Input Handling
 - User input is captured from the command line interface using the `readline` module.
 - Empty messages are not allowed to be sent

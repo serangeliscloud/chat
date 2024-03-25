@@ -1,6 +1,6 @@
 {
   "name": "chat",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "a simple terminal chat",
   "main": "client.js",
   "directories": {

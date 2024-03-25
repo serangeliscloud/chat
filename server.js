@@ -5,7 +5,7 @@ const net = require('net');
 const fs = require('fs');
 
 const PORT = 8000;
-const ALLOWED_VERSION = "1.4.1";
+const ALLOWED_VERSION = "1.4.2";
 
 // ansi codes for colors
 const colors = {
@@ -96,18 +96,36 @@ function GetClientIDByUsername(username, clientSocket) {
     return null;
 }
 
+function GetClientStatusByUsername(username, clientSocket) {
+    // Iterate through the clientsList array to find the client with the matching username
+    for (var i = 0; i < clientsList.length; i++) {
+        if (clientsList[i].Username === username) {
+            // Return the UserID of the matching client
+            const message = {
+                sender: "Server",
+                text: username +"'s status: "+clientsList[i].status,
+            };
+            console.log(message)
+            clientSocket.write(JSON.stringify(message)+ '\r\n' )
+            return clientsList[i].status;
+        }
+    }
+    // If the username is not found, return null or any other appropriate value
+    return null;
+}
+
 function GetVersionByUsername(username, clientSocket) {
     // Iterate through the clientsList array to find the client with the matching username
     for (var i = 0; i < clientsList.length; i++) {
         if (clientsList[i].Username === username) {
             // Return the UserID of the matching client
-            console.log(clientsList[i].Version)
+            // console.log(clientsList[i].Version)
             const message = {
                 sender: "Server",
                 text: username +"'s clientVersion: "+clientsList[i].Version,
             };
             clientSocket.write(JSON.stringify(message)+ '\r\n' )
-            return clientsList[i].UserID;
+            return clientsList[i].Version;
         }
     }
     // If the username is not found, return null or any other appropriate value
@@ -231,7 +249,13 @@ const server = net.createServer(clientSocket => {
                     break;
                 case "getClientVersion":
                     GetVersionByUsername(message.requestedUsername, clientSocket)
+                    break;
+                case "GetClientStatus":
+                    GetClientStatusByUsername(message.requestedUsername, clientSocket)
+                    break;
                 }
+
+                
             } 
             
             else {
