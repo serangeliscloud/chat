@@ -1,4 +1,8 @@
-### 03.25.2024, v1.4.3 
+### 03.26.2024, documentation update
+- fixed typo in changelog
+- complete rewriting of documentation
+
+### 03.26.2024, v1.4.3 
 - created a `!whisper` command it allows you to privately message any user using this format `!whisper [user] [message]`
 
 ### 03.25.2024, readability improvements
