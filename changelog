@@ -1,3 +1,6 @@
+### 03.25.2024, v1.4.3 
+- created a `!whisper` command it allows you to privately message any user using this format `!whisper [user] [message]`
+
 ### 03.25.2024, readability improvements
 - changed code structure
 - changed indentation

@@ -5,7 +5,7 @@ const net = require('net');
 const fs = require('fs');
 
 const PORT = 8000;
-const ALLOWED_VERSION = "1.4.2";
+const ALLOWED_VERSION = "1.4.3";
 
 // ansi codes for colors
 const colors = {
@@ -41,6 +41,11 @@ function broadcast(message, sender) {
             client.socket.write(message);
         }
     });
+}
+
+// whisper
+function whisper(message, RequestedClientSocket) {
+    RequestedClientSocket.write(JSON.stringify(message))
 }
 
 // Function to handle initial messages from clients upon connection
@@ -126,6 +131,20 @@ function GetVersionByUsername(username, clientSocket) {
             };
             clientSocket.write(JSON.stringify(message)+ '\r\n' )
             return clientsList[i].Version;
+        }
+    }
+    // If the username is not found, return null or any other appropriate value
+    console.log("username not found")
+    return null;
+}
+
+function GetClientSocketByUsername(username) {
+    // Iterate through the clientsList array to find the client with the matching username
+    for (var i = 0; i < clientsList.length; i++) {
+        if (clientsList[i].Username === username) {
+            // Return the UserID of the matching client
+            // console.log(clientsList[i].SOCKET) debug 
+            return clientsList[i].SOCKET;
         }
     }
     // If the username is not found, return null or any other appropriate value
@@ -253,6 +272,9 @@ const server = net.createServer(clientSocket => {
                 case "GetClientStatus":
                     GetClientStatusByUsername(message.requestedUsername, clientSocket)
                     break;
+                case "whisper":
+                    RequestedClientSocket = GetClientSocketByUsername(message.recipient)
+                    whisper(message,RequestedClientSocket)
                 }
 
                 

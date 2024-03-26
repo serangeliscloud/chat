@@ -9,6 +9,7 @@ const readline = require('readline');
 const fs = require('fs');
 const crypto = require('crypto');
 const path =  require('path');
+const { enc } = require('crypto-js');
 const HOST = 'localhost';
 const PORT = 8000;
 const ENCRYPTIONPASSKEY = 516;
@@ -449,6 +450,27 @@ rl.on('line', input => {
                             console.log("Missing status for SetStatus command.");
                         }
                         break;
+                        case "whisper":
+                            const [recipient, ...whisperMessage] = args;
+                            if (recipient != USERNAME){
+                            if (recipient && whisperMessage.length > 0) {
+                                const message = {
+                                    sender: USERNAME,
+                                    type: 'command',
+                                    command: "whisper",
+                                    recipient: recipient,
+                                    text: encrypt("whispered: "+whisperMessage.join(' ')), // Join all message parts into a single string
+                                    clientVersionNumber: clientVersion,
+                                    publicEncryptioKey: hashValueEncryptionKey,
+                                    usernameColor: userColor
+                                };
+                                client.write(JSON.stringify(message) + '\r\n');
+                            } else {
+                                console.log("Missing recipient or message for !whisper command.");
+                            }}
+                            else {console.log(colors.red+"You can't whisper to yourself!"+colors.reset)}
+                            break;
+
                         case "Reload":
                             reloadConnection()
                             break;

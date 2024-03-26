@@ -15,3 +15,5 @@ usr/*
 
 # Ignore any temporary files
 *.tmp
+# ignore package-lock
+package-lock.json

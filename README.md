@@ -10,6 +10,7 @@ This repository contains code for a simple chat server and client implemented in
 - **Real-time Communication**: Messages are broadcasted to all connected clients in real-time.
 - **File sharing**: You can share files using commands
 - **commands**: Use commands to interact with the server and to get informations about other users
+- **Private messages**: Send private messages using `!whisper`
 ## Getting Started
 
 ### Prerequisites
