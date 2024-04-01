@@ -3,6 +3,8 @@
 // client.js
 
 // global constants
+// Export the processCommand function
+module.exports.processCommand = processCommand;
 
 const net = require('net');
 const readline = require('readline');
@@ -334,167 +336,203 @@ getUsername((username) => {
         sendInitialMessage();
     });
 });
-rl.on('line', input => {
-    // Trim input to remove leading and trailing whitespace
-    input = input.trim();
+rl.on('line', processInput);
 
-    // Check if the input is not empty
-    if (input !== "") {
-        // Check if the input starts with '!'
-        if (input.startsWith('!')) {
-            // Split input by space to separate command, filepath, and filename
-            const [command, ...args] = input.slice(1).split(' '); // Remove '!' from the command
-            switch(command) {
-                case "time":
-                    const messageTime = {
-                        sender: USERNAME,
-                        type: 'command',
-                        command: "time",
-                        clientVersionNumber: clientVersion
-                    };
-                    // Send the JSON message to the server
-                    client.write(JSON.stringify(messageTime) + '\r\n');
-                    break;
-                case "sendFile":
-                    const [filePath] = args;
-                    if (filePath) {
-                        if (fileExists(filePath)) {
-                            const base64Data = fileToBase64(filePath);
-                        if (base64Data) {
-                            // Parse the file extension
-                            const fileExtension = path.extname(filePath);
-                            const fileMessage = {
-                                sender: USERNAME,
-                                type: 'command',
-                                command: "sendFile",
-                                filePath: filePath,
-                                fileData: base64Data,
-                                fileExtension: fileExtension,
-                                clientVersionNumber: clientVersion
-                            };
-                            client.write(JSON.stringify(fileMessage) + '\r\n');
-                        }
-                    } else {
+function processInput(input) {
+    const trimmedInput = input.trim();
+
+    if (trimmedInput !== "") {
+        if (trimmedInput.startsWith('!')) {
+            processCommand(trimmedInput.slice(1));
+        } else {
+            processMessage(trimmedInput);
+        }
+    } else {
+        console.log(colors.red + "Message cannot be an empty string" + colors.reset);
+    }
+}
+
+function processCommand(input) {
+    const [command, ...args] = input.split(' ');
+
+
+    switch (command) {
+        case "time":
+            sendTimeCommand();
+            break;
+        case "sendFile":
+            sendFileCommand(args);
+            break;
+        case "downloadFile":
+            downloadFileCommand(args);
+            break;
+        case "ClientID":
+            getClientIDCommand(args);
+            break;
+        case "ClientVersion":
+            getClientVersionCommand(args);
+            break;
+        case "GetStatus":
+            getClientStatusCommand(args);
+            break;
+        case "SetStatus":
+            setStatusCommand(args);
+            break;
+        case "whisper":
+            whisperCommand(args);
+            break;
+        case "Reload":
+            reloadConnection();
+            break;
+        default:
+            console.log("Unknown command.");
+    }
+}
+
+function processMessage(input) {
+    const encryptedText = encrypt(input);
+    const message = {
+        sender: USERNAME,
+        text: encryptedText,
+        clientVersionNumber: clientVersion,
+        publicEncryptioKey: hashValueEncryptionKey,
+        usernameColor: userColor
+    };
+    client.write(JSON.stringify(message) + '\r\n');
+}
+
+function sendTimeCommand() {
+    const messageTime = {
+        sender: USERNAME,
+        type: 'command',
+        command: "time",
+        clientVersionNumber: clientVersion
+    };
+    client.write(JSON.stringify(messageTime) + '\r\n');
+}
+
+function sendFileCommand(args) {
+    const [filePath] = args;
+    if (filePath && fileExists(filePath)) {
+        const base64Data = fileToBase64(filePath);
+        if (base64Data) {
+            const fileExtension = path.extname(filePath);
+            const fileMessage = {
+                sender: USERNAME,
+                type: 'command',
+                command: "sendFile",
+                filePath: filePath,
+                fileData: base64Data,
+                fileExtension: fileExtension,
+                clientVersionNumber: clientVersion
+            };
+            client.write(JSON.stringify(fileMessage) + '\r\n');
+        } else {
             console.log("Invalid file path or file does not exist");
         }
     } else {
         console.log("Missing arguments for !sendFile command.");
     }
-    break;
+}
 
-                case "downloadFile":
-                    const [downloadFilePath] = args;
-                    if (downloadFilePath) {
-                        const downloadMessage = {
-                            sender: USERNAME,
-                            type: 'command',
-                            command: "downloadFile",
-                            filePath: downloadFilePath,
-                            clientVersionNumber: clientVersion
-                        };
-                        client.write(JSON.stringify(downloadMessage) + '\r\n');
-                    } else {
-                        console.log("Missing arguments for !downloadFile command.");
-                    }
-                    break;
-                    case "ClientID":
-                        const [requestedUsernameCID] = args; // Rename the variable
-                        if (requestedUsernameCID) {
-                            const message = {
-                                sender: USERNAME,
-                                type: 'command',
-                                command: 'getClientID',
-                                requestedUsername: requestedUsernameCID, // Use the renamed variable here
-                                clientVersionNumber: clientVersion
-                            };
-                            client.write(JSON.stringify(message) + '\r\n');
-                        } else {
-                            console.log("Missing username for getClientID command.");
-                        }
-                        break;
-                    case "ClientVersion":
-                        const [requestedUsernameCV] = args; // Rename the variable
-                        if (requestedUsernameCV) {
-                            const message = {
-                                sender: USERNAME,
-                                type: 'command',
-                                command: 'getClientVersion', // This should be 'getClientVersion'
-                                requestedUsername: requestedUsernameCV, // Use the renamed variable here
-                                clientVersionNumber: clientVersion
-                            };
-                            client.write(JSON.stringify(message) + '\r\n');
-                        } else {
-                            console.log("Missing username for getClientVersion command."); // Corrected error message
-                        }
-                        break;
-                        case "GetStatus":
-                            const [requestedUsernameCS] = args; // Rename the variable
-                            if (requestedUsernameCS) {
-                                const message = {
-                                    sender: USERNAME,
-                                    type: 'command',
-                                    command: 'GetClientStatus', // This should be 'getClientVersion'
-                                    requestedUsername: requestedUsernameCS, // Use the renamed variable here
-                                    clientVersionNumber: clientVersion
-                                };
-                                client.write(JSON.stringify(message) + '\r\n');
-                            } else {
-                                console.log("Missing username for getClientVersion command."); // Corrected error message
-                            }
-                            break;
-                        case "SetStatus":
-                        const status = args.join(' '); // Join all arguments into a single string
-                        if (status) {
-                            setStatus(status);
-                        } else {
-                            console.log("Missing status for SetStatus command.");
-                        }
-                        break;
-                        case "whisper":
-                            const [recipient, ...whisperMessage] = args;
-                            if (recipient != USERNAME){
-                            if (recipient && whisperMessage.length > 0) {
-                                const message = {
-                                    sender: USERNAME,
-                                    type: 'command',
-                                    command: "whisper",
-                                    recipient: recipient,
-                                    text: encrypt("whispered: "+whisperMessage.join(' ')), // Join all message parts into a single string
-                                    clientVersionNumber: clientVersion,
-                                    publicEncryptioKey: hashValueEncryptionKey,
-                                    usernameColor: userColor
-                                };
-                                client.write(JSON.stringify(message) + '\r\n');
-                            } else {
-                                console.log("Missing recipient or message for !whisper command.");
-                            }}
-                            else {console.log(colors.red+"You can't whisper to yourself!"+colors.reset)}
-                            break;
+function downloadFileCommand(args) {
+    const [downloadFilePath] = args;
+    if (downloadFilePath) {
+        const downloadMessage = {
+            sender: USERNAME,
+            type: 'command',
+            command: "downloadFile",
+            filePath: downloadFilePath,
+            clientVersionNumber: clientVersion
+        };
+        client.write(JSON.stringify(downloadMessage) + '\r\n');
+    } else {
+        console.log("Missing arguments for !downloadFile command.");
+    }
+}
 
-                        case "Reload":
-                            reloadConnection()
-                            break;
-                default:
-                    console.log("Unknown command.");
-            }
-        } else {
-            // If not a command, treat it as a regular message
-            const encryptedText = encrypt(input); // Convert encrypted object to string
+// Define other command functions similarly
+
+function getClientIDCommand(args) {
+    const [requestedUsernameCID] = args;
+    if (requestedUsernameCID) {
+        const message = {
+            sender: USERNAME,
+            type: 'command',
+            command: 'getClientID',
+            requestedUsername: requestedUsernameCID,
+            clientVersionNumber: clientVersion
+        };
+        client.write(JSON.stringify(message) + '\r\n');
+    } else {
+        console.log("Missing username for getClientID command.");
+    }
+}
+
+function getClientVersionCommand(args) {
+    const [requestedUsernameCV] = args;
+    if (requestedUsernameCV) {
+        const message = {
+            sender: USERNAME,
+            type: 'command',
+            command: 'getClientVersion',
+            requestedUsername: requestedUsernameCV,
+            clientVersionNumber: clientVersion
+        };
+        client.write(JSON.stringify(message) + '\r\n');
+    } else {
+        console.log("Missing username for getClientVersion command.");
+    }
+}
+
+function getClientStatusCommand(args) {
+    const [requestedUsernameCS] = args;
+    if (requestedUsernameCS) {
+        const message = {
+            sender: USERNAME,
+            type: 'command',
+            command: 'GetClientStatus',
+            requestedUsername: requestedUsernameCS,
+            clientVersionNumber: clientVersion
+        };
+        client.write(JSON.stringify(message) + '\r\n');
+    } else {
+        console.log("Missing username for GetClientStatus command.");
+    }
+}
+
+function setStatusCommand(args) {
+    const status = args.join(' ');
+    if (status) {
+        setStatus(status);
+    } else {
+        console.log("Missing status for SetStatus command.");
+    }
+}
+
+function whisperCommand(args) {
+    const [recipient, ...whisperMessage] = args;
+    if (recipient != USERNAME) {
+        if (recipient && whisperMessage.length > 0) {
             const message = {
                 sender: USERNAME,
-                text: encryptedText,
+                type: 'command',
+                command: "whisper",
+                recipient: recipient,
+                text: encrypt("whispered: " + whisperMessage.join(' ')),
                 clientVersionNumber: clientVersion,
                 publicEncryptioKey: hashValueEncryptionKey,
                 usernameColor: userColor
             };
-            // Send the JSON message to the server
             client.write(JSON.stringify(message) + '\r\n');
+        } else {
+            console.log("Missing recipient or message for !whisper command.");
         }
     } else {
-        // If message is empty
-        console.log(colors.red + "Message cannot be an empty string" + colors.reset);
+        console.log(colors.red + "You can't whisper to yourself!" + colors.reset);
     }
-});
+}
+
 
 
 

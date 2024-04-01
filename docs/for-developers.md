@@ -192,10 +192,246 @@ function askForUsername(callback) {
 
 This function prompts the user to enter a username if the `userInfo.json` file is not found or contains an empty username.
 
+
+
+## Commands
+
+This documentation provides an overview of the functions implemented in the client-side JavaScript code. These functions are responsible for processing input from the client, executing commands, sending messages, and handling file operations.
+
+## `processInput(input)`
+
+### Overview
+
+Processes the input received from the client, distinguishing between commands and regular messages, and delegates the processing accordingly.
+
+### Function Signature
+
+```javascript
+function processInput(input)
+```
+
+### Parameters
+
+- `input` (string): The input string received from the client.
+
+### Error Handling
+
+If the input is an empty string, it logs an error message to the console.
+
+## `processCommand(input)`
+
+### Overview
+
+Processes command input received from the client by parsing and executing the corresponding command.
+
+### Function Signature
+
+```javascript
+function processCommand(input)
+```
+
+### Parameters
+
+- `input` (string): The command input string received from the client.
+
+### Error Handling
+
+If the command is unknown, it logs an error message to the console.
+
+## `processMessage(input)`
+
+### Overview
+
+Processes a regular message input received from the client by encrypting it and sending it to the server.
+
+### Function Signature
+
+```javascript
+function processMessage(input)
+```
+
+### Parameters
+
+- `input` (string): The message input string received from the client.
+
+## `sendTimeCommand()`
+
+### Overview
+
+Sends a command to retrieve the current time from the server.
+
+### Function Signature
+
+```javascript
+function sendTimeCommand()
+```
+
+### Parameters
+
+This function does not accept any parameters.
+
+## `sendFileCommand(args)`
+
+### Overview
+
+Sends a command to the server to send a file, along with the file data encoded in Base64.
+
+### Function Signature
+
+```javascript
+function sendFileCommand(args)
+```
+
+### Parameters
+
+- `args` (Array): An array containing file path as its first element.
+
+### Error Handling
+
+Logs an error message if the file path is invalid or the file does not exist.
+
+## `downloadFileCommand(args)`
+
+### Overview
+
+Sends a command to the server to download a file.
+
+### Function Signature
+
+```javascript
+function downloadFileCommand(args)
+```
+
+### Parameters
+
+- `args` (Array): An array containing the download file path as its first element.
+
+### Error Handling
+
+Logs an error message if the download file path is missing.
+
+## `getClientIDCommand(args)`
+
+### Overview
+
+Sends a command to the server to get the client's ID.
+
+### Function Signature
+
+```javascript
+function getClientIDCommand(args)
+```
+
+### Parameters
+
+- `args` (Array): An array containing the requested username as its first element.
+
+### Error Handling
+
+Logs an error message if the requested username is missing.
+
+## `getClientVersionCommand(args)`
+
+### Overview
+
+Sends a command to the server to get the client's version.
+
+### Function Signature
+
+```javascript
+function getClientVersionCommand(args)
+```
+
+### Parameters
+
+- `args` (Array): An array containing the requested username as its first element.
+
+### Error Handling
+
+Logs an error message if the requested username is missing.
+
+## `getClientStatusCommand(args)`
+
+### Overview
+
+Sends a command to the server to get the client's status.
+
+### Function Signature
+
+```javascript
+function getClientStatusCommand(args)
+```
+
+### Parameters
+
+- `args` (Array): An array containing the requested username as its first element.
+
+### Error Handling
+
+Logs an error message if the requested username is missing.
+
+## `setStatusCommand(args)`
+
+### Overview
+
+Sets the status of the client.
+
+### Function Signature
+
+```javascript
+function setStatusCommand(args)
+```
+
+### Parameters
+
+- `args` (Array): An array containing the status message as its elements.
+
+### Error Handling
+
+Logs an error message if the status message is missing.
+
+## `whisperCommand(args)`
+
+### Overview
+
+Sends a whispered message to another user.
+
+### Function Signature
+
+```javascript
+function whisperCommand(args)
+```
+
+### Parameters
+
+- `args` (Array): An array containing the recipient username as its first element and the message as subsequent elements.
+
+### Error Handling
+
+Logs an error message if the recipient or message is missing, or if the user tries to whisper to themselves.
+
+## `base64ToFile(message)`
+
+### Overview
+
+Handles the conversion of Base64 data received in a message object back to its original file format and saves it to the client's local directory.
+
+### Function Signature
+
+```javascript
+function base64ToFile(message)
+```
+
+### Parameters
+
+- `message` (Object): The message object containing Base64 data and file information.
+
+### Error Handling
+
+Logs an error message if any errors occur during the conversion process.
+
+
 ---
-Certainly! Below is a breakdown of each event listener in the `client.js` script, along with explanations and code snippets:
-
-
 
 ## Event Listeners in `client.js`
 
@@ -253,60 +489,7 @@ Certainly! Let's delve deeper into the `rl.on('line', input)` event listener, fo
 ### `rl.on('line', input)` Event Listener
 
 #### Purpose:
-This event listener captures user input from the command line interface and handles command execution within the chat client application.
-
-#### Explanation:
-- When the user enters a line of text in the command line interface and presses Enter, this event listener is triggered.
-- It receives the user input as `input`.
-- The function distinguishes between regular chat messages and commands by checking if the input string starts with an exclamation mark '!', which denotes a command.
-- If the input is a command, it executes the corresponding functionality. Otherwise, it treats the input as a regular chat message.
-
-#### Code Snippet:
-```javascript
-rl.on('line', input => {
-    // Trim input to remove leading and trailing whitespace
-    input = input.trim();
-
-    // Check if the input is not empty
-    if (input !== "") {
-        // Check if the input starts with '!'
-        if (input.startsWith('!')) {
-            // Split input by space to separate command, filepath, and filename
-            const [command, ...args] = input.slice(1).split(' '); // Remove '!' from the command
-            switch(command) {
-                // Handle different commands
-                case "time":
-                    // Execute time command
-                    break;
-                case "sendFile":
-                    // Execute sendFile command
-                    break;
-                // Other commands...
-                default:
-                    console.log("Unknown command.");
-            }
-        } else {
-            // If not a command, treat it as a regular message
-            // Send the message to the server
-        }
-    } else {
-        // If message is empty
-        console.log(colors.red + "Message cannot be an empty string" + colors.reset);
-    }
-});
-```
-
-#### Command Handling:
-- The listener first trims the input to remove any leading or trailing whitespace and checks if the input is not empty.
-- If the input starts with '!', indicating a command, it splits the input string to separate the command and its arguments.
-- A switch-case statement is used to handle different commands. Each case corresponds to a specific command, such as sending a file (`sendFile`), checking the time (`time`), etc.
-- Within each case, the corresponding functionality for the command is executed.
-- If the input is not a recognized command, it displays an "Unknown command" message.
-
-
---- 
-
-This detailed explanation focuses on the `rl.on('line', input)` event listener, emphasizing its role in handling commands within the chat client application. Understanding this listener is essential for implementing and extending command functionality in the application.
+This event listener captures user input from the command line and processes the input accordingly.
 
 ### 5. `rl.on('SIGINT')`
 
