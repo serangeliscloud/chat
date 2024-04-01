@@ -586,6 +586,14 @@ The `server.js` file serves as the backend server for the chat application, hand
             clientSocket.end(); // Close the connection immediately
             return;
         }
+
+        // Check if the sender is already in the clientsList
+        if (clientsList.some(client => client.Username === message.sender)) {
+            console.log(`Connection from ${message.sender} refused because the user is already connected.`);
+            clientSocket.end(); // Close the connection immediately
+            return;
+        }
+
         dataForClientsArray = {UserID: (clients.length+1), Username: message.sender, Version: message.clientVersionNumber, status: message.status, SOCKET: clientSocket}
         clientsList.push(dataForClientsArray)
         // console.log(clientsList)//  debug - show all connected clients + the one just connected
