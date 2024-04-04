@@ -1,3 +1,6 @@
+### 03.26.2024, v1.4.6
+- created `!ClientsList` command to list all clients connected to the server
+
 ### 03.26.2024, v1.4.5
 - Server will refuse connection if a client with the same username is already connected
 

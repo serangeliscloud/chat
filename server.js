@@ -5,7 +5,7 @@ const net = require('net');
 const fs = require('fs');
 
 const PORT = 8000;
-const ALLOWED_VERSION = "1.4.5";
+const ALLOWED_VERSION = "1.4.6";
 
 // ansi codes for colors
 const colors = {
@@ -238,6 +238,21 @@ function sendFileContents(filePath, clientSocket) {
     }
 }
 
+function GetConnectedClients(clientSocket) {
+    // Extract usernames from the clientsList array
+    const usernames = clientsList.map(client => client.Username);
+
+    // Construct a message containing the list of usernames
+    const message = {
+        sender: "Server",
+        text: "Connected usernames: " + usernames.join(", "),
+    };
+
+    // Send the message to the client
+    clientSocket.write(JSON.stringify(message) + '\r\n');
+}
+
+
 // Create a TCP server
 const server = net.createServer(clientSocket => {
     // Generate a unique ID for the client
@@ -280,10 +295,15 @@ const server = net.createServer(clientSocket => {
                 case "GetClientStatus":
                     GetClientStatusByUsername(message.requestedUsername, clientSocket)
                     break;
+                case "GetConnectedClients":
+                    GetConnectedClients(clientSocket)
+                    break;
                 case "whisper":
                     RequestedClientSocket = GetClientSocketByUsername(message.recipient)
                     whisper(message,RequestedClientSocket)
                 }
+                
+                
 
                 
             } 
