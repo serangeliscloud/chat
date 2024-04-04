@@ -352,6 +352,7 @@ function processInput(input) {
     }
 }
 
+
 function processCommand(input) {
     const [command, ...args] = input.split(' ');
 
@@ -384,6 +385,9 @@ function processCommand(input) {
         case "Reload":
             reloadConnection();
             break;
+        case "ClientsList":
+            getConnectedClients();
+            break;
         default:
             console.log("Unknown command.");
     }
@@ -409,6 +413,16 @@ function sendTimeCommand() {
         clientVersionNumber: clientVersion
     };
     client.write(JSON.stringify(messageTime) + '\r\n');
+}
+
+function getConnectedClients() {
+    const message = {
+        sender: USERNAME, 
+        type: 'command',
+        command: 'GetConnectedClients', 
+        clientVersionNumber: clientVersion
+    };
+    client.write(JSON.stringify(message)+ '\r\n');
 }
 
 function sendFileCommand(args) {
