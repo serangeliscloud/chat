@@ -157,3 +157,4 @@ Here's a comprehensive guide to all the commands available in the chat client ap
 - Commands are prefixed with '!' to distinguish them from regular chat messages.
 - Ensure to provide appropriate arguments with each command to execute them successfully.
 - Some commands may require specific permissions or conditions to execute properly.
+- To test locally allow multiple clients from settings.conf

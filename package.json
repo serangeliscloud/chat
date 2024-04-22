@@ -6,9 +6,7 @@
   "directories": {
     "doc": "docs"
   },
-  "scripts": { 
-
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/serangeliscloud/chat.git"
@@ -20,7 +18,11 @@
   },
   "homepage": "https://github.com/serangeliscloud/chat#readme",
   "dependencies": {
-    "crypto-js": "^4.2.0"
+    "ascii-art": "^2.8.5",
+    "asciify-image": "^0.1.10",
+    "crypto-js": "^4.2.0",
+    "jimp": "^0.22.12",
+    "terminal-image": "^2.0.0"
   },
   "devDependencies": {
     "jest": "^29.7.0"

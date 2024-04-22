@@ -578,7 +578,7 @@ The `server.js` file serves as the backend server for the chat application, hand
      - `clientSocket`: The socket of the connecting client.
    - **Usage:** Validates client version, authenticates clients, and broadcasts join messages.
     ```javascript
-    // Function to handle initial messages from clients upon connection
+        // Function to handle initial messages from clients upon connection
     function handleInitialMessage(message, clientSocket) {
         // Check if the client version matches the allowed version
         if (message.type === 'authentication' && message.clientVersionNumber !== ALLOWED_VERSION) {
@@ -586,14 +586,15 @@ The `server.js` file serves as the backend server for the chat application, hand
             clientSocket.end(); // Close the connection immediately
             return;
         }
-
-        // Check if the sender is already in the clientsList
+        
+        if (allowMultipleLocalClients == "false"){
         if (clientsList.some(client => client.Username === message.sender)) {
+            console.log("multiple usernames not allowed")
             console.log(`Connection from ${message.sender} refused because the user is already connected.`);
             clientSocket.end(); // Close the connection immediately
             return;
-        }
-
+        }}
+        
         dataForClientsArray = {UserID: (clients.length+1), Username: message.sender, Version: message.clientVersionNumber, status: message.status, SOCKET: clientSocket}
         clientsList.push(dataForClientsArray)
         // console.log(clientsList)//  debug - show all connected clients + the one just connected
@@ -605,7 +606,6 @@ The `server.js` file serves as the backend server for the chat application, hand
         const joinMessage = JSON.stringify({ sender: "Server", text: `${message.sender} joined the chat` }) + '\r\n';
         broadcast(joinMessage, clientSocket);
     }
-
     ```
 5. **`handleExitingMessage(message, clientSocket)`**
    - **Purpose:** Handles messages indicating a client leaving the chat.
