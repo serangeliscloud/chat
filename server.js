@@ -19,6 +19,27 @@ const colors = {
     white: "\x1b[37m"
 };
 
+// Read the contents of settings.conf synchronously
+const settings = fs.readFileSync('settings.conf', 'utf8');
+
+// Split the content by newline character to get an array of lines
+const lines = settings.split('\n');
+
+// Initialize a variable to store the value
+let allowMultipleLocalClients;
+
+lines.forEach(line => {
+    // Assuming the format is key = value
+    const [key, value] = line.split('=').map(str => str.trim());
+    if (key === 'AllowMultipleLocalClients') {
+        allowMultipleLocalClients = value
+        console.log(value)
+    }
+});
+
+
+
+
 // Counter for generating unique client IDs
 let nextClientId = 1;
 const clients = []
@@ -57,12 +78,13 @@ function handleInitialMessage(message, clientSocket) {
         return;
     }
     
-    // Check if the sender is already in the clientsList
+    if (allowMultipleLocalClients == "false"){
     if (clientsList.some(client => client.Username === message.sender)) {
+        console.log("multiple usernames not allowed")
         console.log(`Connection from ${message.sender} refused because the user is already connected.`);
         clientSocket.end(); // Close the connection immediately
         return;
-    }
+    }}
     
     dataForClientsArray = {UserID: (clients.length+1), Username: message.sender, Version: message.clientVersionNumber, status: message.status, SOCKET: clientSocket}
     clientsList.push(dataForClientsArray)
@@ -282,7 +304,6 @@ const server = net.createServer(clientSocket => {
                     
                     break
                 case "downloadFile":
-                    // console.log(colors.magenta+"downloadFile command received"+colors.reset)
                     sendFileContents(message.filePath, clientSocket);
                     break;
                      

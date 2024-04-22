@@ -1,3 +1,6 @@
+### 04.22.2024, v1.4.7
+- created `settings.conf` to allow and disallow duplicated usernames
+
 ### 03.26.2024, v1.4.6
 - created `!ClientsList` command to list all clients connected to the server
 
